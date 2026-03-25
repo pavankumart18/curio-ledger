@@ -232,6 +232,10 @@
         .card-dots i:nth-child(3) { background: #fff200; }
         .card-dots i:nth-child(4) { background: #231f20; border: 1px solid rgba(255,255,255,0.2); }
 
+        .card-dots--mind i:nth-child(1) { background: #0f766e; }
+        .card-dots--mind i:nth-child(2) { background: #d97706; }
+        .card-dots--mind i:nth-child(3) { background: #78716c; }
+
         .card-body {
             padding: 1.35rem 1.4rem 1.5rem;
         }
@@ -308,7 +312,38 @@
             </div>
 
             <div class="grid">
-                <a class="card" href="topics/march_24_2026/index.html" style="--delay: 0.2s">
+                <a class="card" href="topics/march_25_2026/index.html" style="--delay: 0.15s">
+                    <div class="card-visual">
+                        <img
+                            class="card-image"
+                            src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&amp;fit=crop&amp;w=1200&amp;q=80"
+                            srcset="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&amp;fit=crop&amp;w=640&amp;q=80 640w,
+                                    https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&amp;fit=crop&amp;w=1200&amp;q=80 1200w"
+                            sizes="(max-width: 480px) 100vw, (max-width: 900px) 50vw, 400px"
+                            width="1200"
+                            height="750"
+                            alt="Abstract visualization suggesting networks, cognition, and machine intelligence."
+                            loading="eager"
+                            decoding="async"
+                        >
+                        <div class="card-visual-scrim" aria-hidden="true"></div>
+                        <div class="card-dots card-dots--mind" aria-hidden="true">
+                            <i></i><i></i><i></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-meta">March 25, 2026 · AI &amp; philosophy</p>
+                        <h2 class="card-title">Can AI suffer?</h2>
+                        <p class="card-lede">Machine consciousness, real LLM experiments, and expert consensus—charts, debate toggles, and a careful walk through what “pain” could mean when the mind is made of data.</p>
+                        <span class="card-cta">
+                            Open data story
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                </a>
+                <a class="card" href="topics/march_24_2026/index.html" style="--delay: 0.25s">
                     <div class="card-visual">
                         <!-- Photo: Unsplash (no key). For a random tag-based image each load, swap src with:
                              https://loremflickr.com/1200/750/newspaper,printing,press -->
@@ -321,7 +356,7 @@
                             width="1200"
                             height="750"
                             alt="Stacks of fresh newspapers—tie-in to print, color registration, and the daily page."
-                            loading="eager"
+                            loading="lazy"
                             decoding="async"
                         >
                         <div class="card-visual-scrim" aria-hidden="true"></div>
