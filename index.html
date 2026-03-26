@@ -236,6 +236,10 @@
         .card-dots--mind i:nth-child(2) { background: #d97706; }
         .card-dots--mind i:nth-child(3) { background: #78716c; }
 
+        .card-dots--f1 i:nth-child(1) { background: #e10600; }
+        .card-dots--f1 i:nth-child(2) { background: #c4a35a; }
+        .card-dots--f1 i:nth-child(3) { background: #e6e2d8; border: 1px solid rgba(0,0,0,0.25); }
+
         .card-body {
             padding: 1.35rem 1.4rem 1.5rem;
         }
@@ -312,6 +316,34 @@
             </div>
 
             <div class="grid">
+                <a class="card" href="topics/march_26_2026/index.html" style="--delay: 0.1s">
+                    <div class="card-visual">
+                        <img
+                            class="card-image"
+                            src="https://source.unsplash.com/1200x750/?formula%201,f1,racing"
+                            width="1200"
+                            height="750"
+                            alt="A Formula 1 racing scene—speed, rules, and the evolving engineering of the sport."
+                            loading="eager"
+                            decoding="async"
+                        >
+                        <div class="card-visual-scrim" aria-hidden="true"></div>
+                        <div class="card-dots card-dots--f1" aria-hidden="true">
+                            <i></i><i></i><i></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-meta">March 26, 2026 · Motorsport &amp; systems</p>
+                        <h2 class="card-title">The anatomy of Formula 1</h2>
+                        <p class="card-lede">A guided dashboard through F1’s evolution: the rules that shape “gameplay,” the technology that rewired speed, and the economics that turned racing into a global machine.</p>
+                        <span class="card-cta">
+                            Open data story
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                </a>
                 <a class="card" href="topics/march_25_2026/index.html" style="--delay: 0.15s">
                     <div class="card-visual">
                         <img
@@ -323,7 +355,7 @@
                             width="1200"
                             height="750"
                             alt="Abstract visualization suggesting networks, cognition, and machine intelligence."
-                            loading="eager"
+                            loading="lazy"
                             decoding="async"
                         >
                         <div class="card-visual-scrim" aria-hidden="true"></div>

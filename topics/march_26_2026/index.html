@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Anatomy of Formula 1: Evolution, Rules & Gameplay</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        f1red: '#e10600',
+                        warmbg: '#faf9f6',
+                        warmcard: '#ffffff',
+                        textdark: '#1e293b',
+                        textmuted: '#64748b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #faf9f6;
+            color: #1e293b;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 50vh;
+                max-height: 450px;
+            }
+        }
+
+        .glass-header {
+            background: rgba(250, 249, 246, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        .nav-link.active {
+            color: #e10600;
+            border-bottom: 2px solid #e10600;
+        }
+
+        .interactive-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Chosen Palette: Warm Light (Slate 50, True White, Slate 800, F1 Red accents) -->
+    <!-- Application Structure Plan: The application is structured as a vertical scrollytelling dashboard. It flows logically from History/Genesis -> Technological Evolution -> Rules & Gameplay -> Modern Economics. This linear but compartmentalized structure allows users to grasp the foundations before understanding the complex modern ruleset. Sticky navigation allows quick jumps. Interactive charts replace dense historical and technical tables. -->
+    <!-- Visualization & Content Choices: 1. Engine Power Evolution -> Goal: Show tech progress -> Method: Line Chart (Chart.js) -> Justification: Clearest way to show horsepower trends over decades. 2. Weekend Format -> Goal: Explain gameplay -> Method: Interactive Tabbed Cards -> Justification: Breaks down complex 3-day schedules into bite-sized, explorable chunks. 3. Points System -> Goal: Inform -> Method: Bar Chart (Chart.js) -> Justification: Visually demonstrates the weight of finishing positions. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const SectionIntro = ({ title, icon, children }) => (
+            <div className="mb-8 max-w-3xl">
+                <h2 className="text-3xl font-bold mb-4 flex items-center gap-3">
+                    <span className="text-3xl">{icon}</span> {title}
+                </h2>
+                <p className="text-lg text-textmuted leading-relaxed">
+                    {children}
+                </p>
+            </div>
+        );
+
+        const HistoryTimeline = () => {
+            const events = [
+                { year: "1950", title: "The Genesis", desc: "The FIA establishes the Formula One World Championship. The first race is held at Silverstone, dominated by Alfa Romeo. Safety is minimal; drivers wear cloth caps." },
+                { year: "1960s", title: "Rear-Engine Revolution", desc: "British 'garagistes' like Cooper and Lotus move the engine behind the driver, drastically improving handling and weight distribution. Wings appear late in the decade." },
+                { year: "1970s", title: "The Aerodynamic Age", desc: "Lotus pioneers 'Ground Effect' aerodynamics, using the car's underbody to suck it to the track. Commercial sponsorship (tobacco) transforms the sport's economy." },
+                { year: "1980s", title: "The Turbo Monsters", desc: "Engineers extract over 1,200 horsepower from tiny 1.5L turbocharged engines in qualifying. Carbon fiber monocoques (McLaren MP4/1) revolutionize driver safety." },
+                { year: "1994", title: "The Safety Pivot", desc: "Following the tragic deaths of Ayrton Senna and Roland Ratzenberger at Imola, the FIA mandates sweeping safety changes, grooved tires, and structural crash tests." },
+                { year: "2014", title: "The Hybrid Era", desc: "F1 adopts 1.6L V6 turbo-hybrid power units. These are the most thermally efficient engines on earth (>50% efficiency), featuring MGU-K (kinetic) and MGU-H (heat) recovery systems." },
+                { year: "2026", title: "The Sustainable Future", desc: "Regulations mandate 100% sustainable fuels, a 50/50 power split between internal combustion and electric power, active aerodynamics, and the removal of the DRS system for Manual Override." }
+            ];
+
+            const [activeIndex, setActiveIndex] = useState(0);
+
+            return (
+                <div className="bg-warmcard p-6 md:p-10 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="flex flex-col md:flex-row gap-8">
+                        <div className="md:w-1/3 border-l-2 border-slate-200">
+                            {events.map((evt, idx) => (
+                                <button 
+                                    key={idx}
+                                    onClick={() => setActiveIndex(idx)}
+                                    className={`w-full text-left pl-4 py-3 relative transition-colors ${activeIndex === idx ? 'text-f1red font-bold' : 'text-textmuted hover:text-textdark'}`}
+                                >
+                                    <div className={`absolute -left-[9px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-4 border-warmcard ${activeIndex === idx ? 'bg-f1red' : 'bg-slate-300'}`}></div>
+                                    <div className="text-sm font-mono">{evt.year}</div>
+                                    <div className="font-semibold">{evt.title}</div>
+                                </button>
+                            ))}
+                        </div>
+                        <div className="md:w-2/3 flex items-center">
+                            <div className="p-8 bg-slate-50 rounded-xl border border-slate-100 w-full min-h-[250px] flex flex-col justify-center interactive-card">
+                                <h3 className="text-3xl font-black text-textdark mb-2">{events[activeIndex].year}</h3>
+                                <h4 className="text-xl font-bold text-f1red mb-4">{events[activeIndex].title}</h4>
+                                <p className="text-lg text-textmuted leading-relaxed">{events[activeIndex].desc}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const EngineChart = () => {
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
+
+            useEffect(() => {
+                if (chartInstance.current) {
+                    chartInstance.current.destroy();
+                }
+
+                const ctx = chartRef.current.getContext('2d');
+                chartInstance.current = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1950 (1.5L)', '1966 (3.0L)', '1986 (1.5L Turbo)', '2004 (3.0L V10)', '2014 (1.6L Hybrid)', '2026 (1.6L Hybrid)'],
+                        datasets: [
+                            {
+                                label: 'Total Horsepower (Approx Peak)',
+                                data: [400, 420, 1300, 950, 1000, 1050],
+                                borderColor: '#e10600',
+                                backgroundColor: 'rgba(225, 6, 0, 0.1)',
+                                borderWidth: 3,
+                                pointBackgroundColor: '#1e293b',
+                                pointRadius: 5,
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.parsed.y + ' HP';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Horsepower' }
+                            }
+                        }
+                    }
+                });
+
+                return () => {
+                    if (chartInstance.current) chartInstance.current.destroy();
+                };
+            }, []);
+
+            return (
+                <div className="bg-warmcard p-6 rounded-2xl shadow-sm border border-slate-100 mt-8">
+                    <h3 className="text-xl font-bold mb-4 text-center">The Pursuit of Power: Historical Engine Output</h3>
+                    <div className="chart-container">
+                        <canvas ref={chartRef}></canvas>
+                    </div>
+                    <p className="text-sm text-center text-textmuted mt-4">
+                        Note the massive spike during the unrestricted 1980s Turbo era, followed by regulations to slow cars down, and the eventual rise back to 1000+ HP through modern thermal efficiency.
+                    </p>
+                </div>
+            );
+        };
+
+        const GameplaySection = () => {
+            const [activeTab, setActiveTab] = useState('standard');
+
+            return (
+                <div className="space-y-8">
+                    <div className="bg-warmcard p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <div className="flex border-b border-slate-200 mb-6">
+                            <button 
+                                onClick={() => setActiveTab('standard')}
+                                className={`px-6 py-3 font-semibold ${activeTab === 'standard' ? 'text-f1red border-b-2 border-f1red' : 'text-textmuted'}`}
+                            >
+                                Standard Weekend
+                            </button>
+                            <button 
+                                onClick={() => setActiveTab('sprint')}
+                                className={`px-6 py-3 font-semibold ${activeTab === 'sprint' ? 'text-f1red border-b-2 border-f1red' : 'text-textmuted'}`}
+                            >
+                                Sprint Weekend
+                            </button>
+                            <button 
+                                onClick={() => setActiveTab('flags')}
+                                className={`px-6 py-3 font-semibold ${activeTab === 'flags' ? 'text-f1red border-b-2 border-f1red' : 'text-textmuted'}`}
+                            >
+                                Flags & Rules
+                            </button>
+                        </div>
+
+                        {activeTab === 'standard' && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 interactive-card">
+                                    <h4 className="font-bold text-lg mb-2">🗓️ Friday: Practice</h4>
+                                    <p className="text-sm text-textmuted">Two 60-minute sessions (FP1 & FP2). Teams test setups, evaluate tire degradation, and gather aerodynamic data using "flow-vis" paint and sensor rakes.</p>
+                                </div>
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 interactive-card">
+                                    <h4 className="font-bold text-lg mb-2">⏱️ Saturday: Qualifying</h4>
+                                    <p className="text-sm text-textmuted">Knockout format. <strong>Q1 (18 mins):</strong> Bottom 5 eliminated. <strong>Q2 (15 mins):</strong> Next bottom 5 eliminated. <strong>Q3 (12 mins):</strong> Top 10 battle for Pole Position. Fastest single lap wins.</p>
+                                </div>
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 interactive-card border-b-4 border-b-f1red">
+                                    <h4 className="font-bold text-lg mb-2">🏁 Sunday: The Grand Prix</h4>
+                                    <p className="text-sm text-textmuted">Race distance is the least number of laps to exceed 305km (except Monaco). Drivers must use at least two different dry tire compounds, necessitating at least one pit stop.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'sprint' && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 interactive-card">
+                                    <h4 className="font-bold text-lg mb-2">🗓️ Friday: FP1 & Sprint Quali</h4>
+                                    <p className="text-sm text-textmuted">Only one 60-min practice session before cars enter Parc Fermé. Friday afternoon hosts the "Sprint Shootout" to determine the grid for Saturday's mini-race.</p>
+                                </div>
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 interactive-card">
+                                    <h4 className="font-bold text-lg mb-2">🏎️ Saturday: Sprint & Quali</h4>
+                                    <p className="text-sm text-textmuted">Morning: The 100km Sprint Race (top 8 score points). Afternoon: Standard Qualifying session to determine the grid for Sunday's main Grand Prix.</p>
+                                </div>
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 interactive-card border-b-4 border-b-f1red">
+                                    <h4 className="font-bold text-lg mb-2">🏁 Sunday: The Grand Prix</h4>
+                                    <p className="text-sm text-textmuted">The main event runs exactly as it does on a standard weekend. The Sprint format is designed to provide "meaningful competitive track action" on all three days.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'flags' && (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="p-4 rounded-xl flex items-center gap-3 bg-yellow-100 text-yellow-900 interactive-card">
+                                    <div className="w-6 h-6 bg-yellow-400 rounded-sm"></div>
+                                    <div>
+                                        <div className="font-bold text-sm">Yellow</div>
+                                        <div className="text-xs">Danger. No overtaking.</div>
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-xl flex items-center gap-3 bg-red-100 text-red-900 interactive-card">
+                                    <div className="w-6 h-6 bg-red-600 rounded-sm"></div>
+                                    <div>
+                                        <div className="font-bold text-sm">Red</div>
+                                        <div className="text-xs">Session stopped.</div>
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-xl flex items-center gap-3 bg-blue-100 text-blue-900 interactive-card">
+                                    <div className="w-6 h-6 bg-blue-500 rounded-sm"></div>
+                                    <div>
+                                        <div className="font-bold text-sm">Blue</div>
+                                        <div className="text-xs">Let faster car pass.</div>
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-xl flex items-center gap-3 bg-slate-200 text-slate-900 interactive-card">
+                                    <div className="w-6 h-6 bg-black rounded-sm flex items-center justify-center"><div className="w-3 h-3 bg-orange-500 rounded-full"></div></div>
+                                    <div>
+                                        <div className="font-bold text-sm">Meatball</div>
+                                        <div className="text-xs">Mechanical damage.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const PointsChart = () => {
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
+
+            useEffect(() => {
+                if (chartInstance.current) chartInstance.current.destroy();
+
+                const ctx = chartRef.current.getContext('2d');
+                chartInstance.current = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'],
+                        datasets: [{
+                            label: 'Championship Points Awarded',
+                            data: [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
+                            backgroundColor: [
+                                '#e10600', '#1e293b', '#1e293b', '#64748b', '#64748b', 
+                                '#94a3b8', '#94a3b8', '#cbd5e1', '#cbd5e1', '#e2e8f0'
+                            ],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => `${ctx.parsed.y} Points`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Points' } }
+                        }
+                    }
+                });
+
+                return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+            }, []);
+
+            return (
+                <div className="bg-warmcard p-6 rounded-2xl shadow-sm border border-slate-100 mt-8">
+                    <h3 className="text-xl font-bold mb-4 text-center">The Points Distribution (Grand Prix)</h3>
+                    <div className="chart-container h-[30vh]">
+                        <canvas ref={chartRef}></canvas>
+                    </div>
+                    <div className="text-center mt-4">
+                        <span className="inline-block px-3 py-1 bg-slate-100 rounded-full text-xs font-semibold text-textmuted">
+                            +1 Point awarded to the driver with the Fastest Lap (if they finish in the Top 10).
+                        </span>
+                    </div>
+                </div>
+            );
+        };
+
+        const EconomicsSection = () => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-warmcard p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 className="text-2xl font-bold mb-4">💰 The Cost Cap Era</h3>
+                    <p className="text-textmuted mb-6">
+                        Historically, F1 was a spending war. Top teams like Ferrari and Mercedes would spend upwards of $400 million annually, making it impossible for smaller independent teams to compete. In 2021, the FIA introduced strict Financial Regulations.
+                    </p>
+                    <div className="space-y-4">
+                        <div>
+                            <div className="flex justify-between mb-1">
+                                <span className="font-semibold text-sm">Pre-2021 Top Team Spend</span>
+                                <span className="font-mono text-sm text-f1red">~$400M+</span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-3">
+                                <div className="bg-slate-300 h-3 rounded-full" style={{width: '100%'}}></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="flex justify-between mb-1">
+                                <span className="font-semibold text-sm">2026 Base Cost Cap Limit</span>
+                                <span className="font-mono text-sm text-green-600">$215M</span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-3">
+                                <div className="bg-green-500 h-3 rounded-full" style={{width: '53.75%'}}></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p className="text-xs text-textmuted mt-4">
+                        *Excludes driver salaries, top 3 executive salaries, and marketing costs. Breaching the cap results in severe sporting penalties (e.g., wind tunnel time reduction or points deduction).
+                    </p>
+                </div>
+
+                <div className="bg-warmcard p-8 rounded-2xl shadow-sm border border-slate-100 bg-slate-900 text-white">
+                    <h3 className="text-2xl font-bold mb-4 text-white">⚙️ Team Infrastructure</h3>
+                    <p className="text-slate-400 mb-6">
+                        A modern Formula 1 team is essentially a highly advanced aerospace engineering firm. To put two cars on the grid requires immense logistical and human resources.
+                    </p>
+                    <ul className="space-y-4">
+                        <li className="flex items-center gap-4 border-b border-slate-800 pb-2">
+                            <span className="text-2xl">👥</span>
+                            <div>
+                                <div className="font-bold text-white">Personnel</div>
+                                <div className="text-sm text-slate-400">800 to 1,200 employees per team (aerodynamicists, mechanics, strategists).</div>
+                            </div>
+                        </li>
+                        <li className="flex items-center gap-4 border-b border-slate-800 pb-2">
+                            <span className="text-2xl">🌬️</span>
+                            <div>
+                                <div className="font-bold text-white">Wind Tunnel & CFD</div>
+                                <div className="text-sm text-slate-400">Restricted usage based on championship position (worst team gets more testing time).</div>
+                            </div>
+                        </li>
+                        <li className="flex items-center gap-4">
+                            <span className="text-2xl">✈️</span>
+                            <div>
+                                <div className="font-bold text-white">Logistics</div>
+                                <div className="text-sm text-slate-400">Moving 50 tons of freight across 20+ countries over 9 months.</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [activeSection, setActiveSection] = useState('history');
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    const sections = ['history', 'tech', 'gameplay', 'economy'];
+                    for (const section of sections) {
+                        const el = document.getElementById(section);
+                        if (el) {
+                            const rect = el.getBoundingClientRect();
+                            if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+                                setActiveSection(section);
+                            }
+                        }
+                    }
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const scrollTo = (id) => {
+                document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col items-center">
+                    <nav className="fixed top-0 w-full glass-header z-50 px-6 py-4 flex justify-center shadow-sm">
+                        <div className="flex gap-6 md:gap-12 font-semibold text-sm md:text-base">
+                            <button onClick={() => scrollTo('history')} className={`nav-link pb-1 ${activeSection === 'history' ? 'active' : 'text-textmuted'}`}>Genesis</button>
+                            <button onClick={() => scrollTo('tech')} className={`nav-link pb-1 ${activeSection === 'tech' ? 'active' : 'text-textmuted'}`}>Engineering</button>
+                            <button onClick={() => scrollTo('gameplay')} className={`nav-link pb-1 ${activeSection === 'gameplay' ? 'active' : 'text-textmuted'}`}>Gameplay</button>
+                            <button onClick={() => scrollTo('economy')} className={`nav-link pb-1 ${activeSection === 'economy' ? 'active' : 'text-textmuted'}`}>Economics</button>
+                        </div>
+                    </nav>
+
+                    <header className="w-full max-w-6xl mx-auto px-6 pt-32 pb-20 text-center">
+                        <div className="inline-block px-4 py-1 bg-red-100 text-f1red font-bold rounded-full text-sm mb-6 uppercase tracking-wider">Interactive Report</div>
+                        <h1 className="text-5xl md:text-7xl font-black text-textdark mb-6 tracking-tight">The Anatomy of <span className="text-f1red">Formula 1</span></h1>
+                        <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed">
+                            An exploratory data story decoding the historical evolution, technological arms race, rules of engagement, and modern political economy of the pinnacle of motorsport.
+                        </p>
+                    </header>
+
+                    <main className="w-full max-w-5xl mx-auto px-6 space-y-32 pb-32">
+                        
+                        <section id="history" className="scroll-mt-32">
+                            <SectionIntro title="Evolution & History" icon="📜">
+                                This section explores the timeline of Formula 1. From its genesis in 1950 as a gentleman's pursuit to the technologically advanced, highly regulated sustainable era of 2026. Understanding these eras is crucial to understanding why the current cars look and function the way they do.
+                            </SectionIntro>
+                            <HistoryTimeline />
+                        </section>
+
+                        <section id="tech" className="scroll-mt-32">
+                            <SectionIntro title="The Engineering Arms Race" icon="🔧">
+                                Formula 1 is fundamentally an engineering competition. Here we visualize the historical pursuit of internal combustion horsepower, highlighting how regulations have repeatedly stepped in to curb dangerous speeds, leading to today's highly efficient hybrid power units.
+                            </SectionIntro>
+                            <EngineChart />
+                        </section>
+
+                        <section id="gameplay" className="scroll-mt-32">
+                            <SectionIntro title="Rules of Engagement" icon="🏁">
+                                How is the game actually played? This section demystifies the structure of a Grand Prix weekend, the difference between Standard and Sprint formats, the communication system of racing flags, and how the World Championship points are distributed.
+                            </SectionIntro>
+                            <GameplaySection />
+                            <PointsChart />
+                        </section>
+
+                        <section id="economy" className="scroll-mt-32">
+                            <SectionIntro title="The Political Economy" icon="📊">
+                                Survival in Formula 1 requires more than just speed; it requires immense capital and logistical mastery. Explore how modern financial regulations (Cost Caps) are attempting to level the playing field against historic corporate giants.
+                            </SectionIntro>
+                            <EconomicsSection />
+                        </section>
+
+                    </main>
+
+                    <footer className="w-full bg-slate-900 text-slate-400 py-12 text-center text-sm">
+                        <p className="mb-2">Created for Exploratory Analysis. Data reflects historical F1 statistics and regulations up to the 2026 framework.</p>
+                        <p>&copy; {new Date().getFullYear()} Formula Data Story.</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
