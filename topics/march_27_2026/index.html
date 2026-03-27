@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decoding the Indian License Plate: A Data Story</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- 
+    <!-- Chosen Palette: Slate (Dark Mode) with Vibrant Plate Accents -->
+    <!-- Application Structure Plan: This SPA uses a dark-themed, scroll-driven "Data Story" format (scrollytelling) to make the dense report highly engaging. It is divided into 8 distinct chapters matching the report's themes. 
+         - It uses Intersection Observers to fade in elements.
+         - Chapter 1: Standard Anatomy uses an interactive breakout.
+         - Chapter 2: Color Coding uses an interactive gallery grid.
+         - Chapter 3: HSRP features an animated CSS "scanner" and clickable hotspots.
+         - Chapter 4: Environmental Stickers uses dynamic CSS manipulation based on fuel toggles.
+         - Chapter 5: BH Series features an interactive tax calculator and Chart.js visualization.
+         - Chapter 6: Military features a dynamic decoder.
+         - Chapter 7 & 8: Diplomatic/Constitutional/Vintage use interactive toggles and flip cards to show "Before/After" and rules.
+         This structure chunks the heavy information into digestible, interactive modules, preventing cognitive overload while ensuring 100% data inclusion. -->
+    <!-- Visualization & Content Choices: 
+         - Plate Anatomy -> Interactive HTML grid with hover states -> Goal: Detail parts (NO SVG).
+         - Colors -> Clickable CSS-styled plates -> Goal: Compare usage (NO SVG).
+         - HSRP -> Animated CSS line + absolutely positioned pulse dots -> Goal: Detail security features (NO SVG).
+         - Third Plate -> HTML shapes with border colors manipulated via JS -> Goal: Explain environmental cues (NO SVG).
+         - BH Tax -> Interactive form + Chart.js Bar Chart -> Goal: Compare 15yr vs 2yr tax burdens.
+         - Military Decoder -> Select dropdown updating HTML text/styles -> Goal: Parse complex string logic.
+         - Constitutional -> CSS Flip Card -> Goal: Show Pre-2018 vs Post-2018 transition.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Share+Tech+Mono&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc; /* Slate 50 */
+            overflow-x: hidden;
+        }
+
+        .plate-font {
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 0.08em;
+        }
+
+        /* Mandatory Chart Container */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        /* Standard Plate Base */
+        .plate-base {
+            border: 4px solid #1e293b;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            overflow: hidden;
+        }
+
+        .plate-ind-mark {
+            position: absolute;
+            left: 6px;
+            bottom: 6px;
+            font-family: sans-serif;
+            font-size: 0.6rem;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        /* HSRP Scanner Animation */
+        .scanner-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(56, 189, 248, 0.8);
+            box-shadow: 0 0 10px 2px rgba(56, 189, 248, 0.5);
+            animation: scan 3s ease-in-out infinite alternate;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Pulse Hotspots */
+        .hotspot {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(234, 179, 8, 0.8);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 30;
+            animation: pulse 2s infinite;
+            border: 2px solid white;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); transform: scale(0.9); }
+            70% { box-shadow: 0 0 0 15px rgba(234, 179, 8, 0); transform: scale(1.1); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); transform: scale(0.9); }
+        }
+
+        /* Scroll Reveal Utilities */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Windshield Sticker */
+        .windshield-sticker {
+            width: 150px;
+            height: 150px;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: background-color 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #111;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .bs6-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background-color: #22c55e; /* Green 500 */
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            transition: opacity 0.3s;
+        }
+
+        /* Flip Card */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Hero Section -->
+    <header class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
+        <!-- Abstract Background elements -->
+        <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, #fff 10px, #fff 11px);"></div>
+        
+        <div class="z-10 reveal active max-w-4xl">
+            <div class="inline-block bg-white text-black plate-font text-5xl md:text-8xl p-4 md:p-8 rounded-xl border-8 border-slate-700 shadow-2xl mb-8 transform -rotate-2 hover:rotate-0 transition-transform duration-500">
+                IND 2026
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">
+                The Anatomy of Identity
+            </h1>
+            <p class="text-lg md:text-2xl text-slate-300 font-light max-w-3xl mx-auto leading-relaxed">
+                From unregulated painted signs to cryptographically secure digital nodes. Explore the vast, multi-layered data encoded on every Indian vehicle registration plate.
+            </p>
+            <div class="mt-12 animate-bounce text-slate-400 text-3xl">↓</div>
+        </div>
+    </header>
+
+    <!-- Chapter 1: Standard Format -->
+    <section class="py-24 px-4 md:px-8 max-w-6xl mx-auto reveal">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <p class="text-blue-400 font-bold tracking-widest uppercase text-sm mb-2">Chapter 01</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">The Alphanumeric Architecture</h2>
+                <p class="text-slate-300 mb-6 text-lg leading-relaxed">
+                    Governed by the Motor Vehicles Act of 1988, the standard Indian plate format (AA 11 BB 1111) is a hierarchical locator. It establishes jurisdiction and allows vast mathematical expansion while excluding letters 'I' and 'O' to prevent OCR camera confusion.
+                </p>
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-xl font-bold text-teal-300 mb-2">Mathematical Capacity</h3>
+                    <p class="text-sm text-slate-400 mb-4">A standard two-letter series using 24 letters yields 576 combinations. Multiplied by 9,999 numbers:</p>
+                    <div class="text-5xl font-bold plate-font text-white" id="capacity-counter">0</div>
+                    <p class="text-sm text-slate-400 mt-2">theoretical registrations per RTO before structural exhaustion protocols (like adding a letter after the RTO code, e.g., TN 60A) are triggered.</p>
+                </div>
+                <p class="text-slate-400 text-sm mt-4 italic">*VIP/Fancy numbers (e.g., 0001, 9999) are withheld from automatic assignment and publicly auctioned for state revenue.</p>
+            </div>
+            
+            <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl border border-slate-700 flex flex-col items-center">
+                <p class="text-slate-400 text-sm mb-8 text-center">Hover or tap segments to decode</p>
+                
+                <div class="plate-base bg-white text-black text-4xl md:text-5xl plate-font mb-12 flex gap-3 cursor-pointer">
+                    <div class="plate-ind-mark text-blue-800"><span class="text-[8px]">🔵</span>IND</div>
+                    <span class="pl-4 hover:text-blue-600 transition-colors" onmouseover="showAnatomy('state')" onclick="showAnatomy('state')">DL</span>
+                    <span class="hover:text-blue-600 transition-colors" onmouseover="showAnatomy('rto')" onclick="showAnatomy('rto')">1C</span>
+                    <span class="hover:text-blue-600 transition-colors" onmouseover="showAnatomy('series')" onclick="showAnatomy('series')">AB</span>
+                    <span class="hover:text-blue-600 transition-colors" onmouseover="showAnatomy('num')" onclick="showAnatomy('num')">1234</span>
+                </div>
+
+                <div id="anatomy-display" class="w-full min-h-[120px] bg-slate-900 rounded-lg p-6 border-l-4 border-blue-500">
+                    <h4 class="text-xl font-bold text-white mb-2" id="ana-title">Macro Geography: State Code</h4>
+                    <p class="text-slate-400" id="ana-desc">The first two letters (e.g., DL for Delhi, MH for Maharashtra) designate the State or Union Territory of original registration.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 2: Color Spectrum -->
+    <section class="py-24 px-4 md:px-8 max-w-7xl mx-auto reveal">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <p class="text-blue-400 font-bold tracking-widest uppercase text-sm mb-2">Chapter 02</p>
+            <h2 class="text-3xl md:text-5xl font-bold mb-6">The Color-Coding Paradigm</h2>
+            <p class="text-slate-300 text-lg leading-relaxed">
+                Color dictates the regulatory burden. It immediately categorizes ownership, economic utility, and powertrain technology for rapid law enforcement and tolling logic. Unauthorized color changes void insurance and attract fines.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Private -->
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-slate-500 transition-all cursor-pointer group">
+                <div class="plate-base bg-white text-black plate-font text-2xl w-full mb-4 group-hover:scale-105 transition-transform">MH 12 AB 1234</div>
+                <h3 class="text-xl font-bold mb-2">Private Vehicle</h3>
+                <p class="text-sm text-slate-400">Strictly restricted to personal mobility. Prohibited from generating transport revenue. Lowest tax slabs.</p>
+            </div>
+            
+            <!-- Commercial -->
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-slate-500 transition-all cursor-pointer group">
+                <div class="plate-base bg-yellow-400 text-black plate-font text-2xl w-full mb-4 border-black group-hover:scale-105 transition-transform">UP 32 TX 9090</div>
+                <h3 class="text-xl font-bold mb-2">Commercial Transport</h3>
+                <p class="text-sm text-slate-400">Taxis, buses, trucks. Authorized for financial hire. Requires commercial driving licenses, permits, and fitness certs.</p>
+            </div>
+
+            <!-- EV Private -->
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-slate-500 transition-all cursor-pointer group">
+                <div class="plate-base bg-green-600 text-white plate-font text-2xl w-full mb-4 border-white group-hover:scale-105 transition-transform">KA 01 EV 0001</div>
+                <h3 class="text-xl font-bold mb-2">Private EV</h3>
+                <p class="text-sm text-slate-400">Zero-emission personal assets. Eligible for toll discounts, tax subsidies, and exemption from traffic rationing.</p>
+            </div>
+
+            <!-- EV Commercial -->
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-slate-500 transition-all cursor-pointer group">
+                <div class="plate-base bg-green-600 text-yellow-400 plate-font text-2xl w-full mb-4 border-yellow-400 group-hover:scale-105 transition-transform">DL 1Z EV 8888</div>
+                <h3 class="text-xl font-bold mb-2">Commercial EV</h3>
+                <p class="text-sm text-slate-400">Electric taxis and e-rickshaws. Combines EV subsidies with commercial transport authorizations.</p>
+            </div>
+
+            <!-- Rental -->
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-slate-500 transition-all cursor-pointer group">
+                <div class="plate-base bg-black text-yellow-400 plate-font text-2xl w-full mb-4 border-yellow-400 group-hover:scale-105 transition-transform">TN 09 RE 3322</div>
+                <h3 class="text-xl font-bold mb-2">Self-Drive Rental</h3>
+                <p class="text-sm text-slate-400">Commercial asset owned by a corporate entity, operated by a consumer. Driver does NOT need a commercial license.</p>
+            </div>
+
+            <!-- Temporary -->
+            <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-slate-500 transition-all cursor-pointer group">
+                <div class="plate-base bg-red-600 text-white plate-font text-2xl w-full mb-4 border-white group-hover:scale-105 transition-transform">TS 09 TMP 123</div>
+                <h3 class="text-xl font-bold mb-2">Temporary / Trade</h3>
+                <p class="text-sm text-slate-400">Unregistered vehicles in transit or testing. Strictly time-bound validity (usually max 1 month).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 3: HSRP -->
+    <section class="py-24 bg-slate-800 reveal">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <div class="mb-16 text-center">
+                <p class="text-blue-400 font-bold tracking-widest uppercase text-sm mb-2">Chapter 03</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">High-Security Registration Plates (HSRP)</h2>
+                <p class="text-slate-300 text-lg max-w-3xl mx-auto">
+                    Mandatory for all vehicles. HSRP integrates advanced metallurgy, optics, and digital cryptography to eradicate counterfeiting and vehicle theft. <br/>
+                    <span class="text-teal-400 font-semibold mt-2 inline-block">Click the pulsing nodes to scan security features.</span>
+                </p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-12 items-center">
+                <!-- HSRP Visual -->
+                <div class="relative w-full lg:w-1/2 flex justify-center p-8">
+                    <!-- The Plate -->
+                    <div class="plate-base bg-white text-black plate-font text-5xl md:text-6xl px-12 py-8 shadow-[0_0_30px_rgba(255,255,255,0.1)] relative">
+                        <div class="scanner-line"></div>
+                        
+                        <!-- Simulated Hologram -->
+                        <div class="absolute top-2 left-2 w-6 h-6 rounded-full bg-gradient-to-tr from-blue-300 via-stone-200 to-blue-400 border border-stone-400 flex items-center justify-center opacity-90 shadow-inner">
+                            <span class="text-[6px] font-bold text-black opacity-50">CHAKRA</span>
+                        </div>
+                        
+                        <!-- IND text -->
+                        <div class="absolute top-10 left-3 text-[10px] font-sans text-blue-800 font-bold">IND</div>
+                        
+                        <!-- Simulated Laser PIN -->
+                        <div class="absolute bottom-2 left-2 text-[8px] font-sans text-stone-500 tracking-widest">AA1234567890</div>
+                        
+                        <!-- Snap locks -->
+                        <div class="absolute top-2 left-1/4 w-3 h-3 bg-stone-300 rounded-full shadow-inner border border-stone-400"></div>
+                        <div class="absolute top-2 right-1/4 w-3 h-3 bg-stone-300 rounded-full shadow-inner border border-stone-400"></div>
+
+                        MH 02 EE 7777
+
+                        <!-- Hotspots -->
+                        <div class="hotspot" style="top: 0px; left: 0px;" onclick="showHSRP('hologram')"></div>
+                        <div class="hotspot" style="bottom: -5px; left: -5px;" onclick="showHSRP('pin')"></div>
+                        <div class="hotspot" style="top: -5px; left: 24%;" onclick="showHSRP('snap')"></div>
+                        <div class="hotspot" style="top: 40%; left: 45%;" onclick="showHSRP('emboss')"></div>
+                        <div class="hotspot" style="top: -10px; right: -10px;" onclick="showHSRP('rfid')"></div>
+                    </div>
+                </div>
+
+                <!-- HSRP Info Panel -->
+                <div class="w-full lg:w-1/2">
+                    <div id="hsrp-panel" class="bg-slate-900 border border-slate-700 p-8 rounded-2xl min-h-[300px] flex flex-col justify-center transition-all duration-300">
+                        <div class="text-slate-500 text-center text-lg italic" id="hsrp-default">
+                            Awaiting scan... Select a security node on the plate.
+                        </div>
+                        <div id="hsrp-content" class="hidden">
+                            <div class="inline-block bg-teal-900/50 text-teal-400 px-3 py-1 rounded-full text-xs font-bold mb-4 uppercase tracking-widest border border-teal-800" id="hsrp-tag">Security Feature</div>
+                            <h3 class="text-2xl font-bold mb-4 text-white" id="hsrp-title"></h3>
+                            <p class="text-slate-300 text-lg leading-relaxed" id="hsrp-desc"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 4: Environmental Diagnostics -->
+    <section class="py-24 px-4 md:px-8 max-w-5xl mx-auto reveal">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="order-2 md:order-1 flex flex-col items-center">
+                <!-- Windshield Simulator -->
+                <div class="w-full max-w-sm h-64 bg-slate-900 rounded-t-full border-4 border-slate-700 relative overflow-hidden flex items-start justify-center pt-8">
+                    <!-- The Sticker -->
+                    <div id="third-plate" class="windshield-sticker bg-blue-200">
+                        <div id="bs6-strip" class="bs6-strip opacity-0"></div>
+                        <div class="mt-4 text-sm font-sans flex flex-col gap-1">
+                            <span>AA12345678</span>
+                            <span>DL1CAA1111</span>
+                            <span class="text-[10px]">Laser Code</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center text-slate-500 mt-4 text-sm">Interior Windshield View</p>
+            </div>
+
+            <div class="order-1 md:order-2">
+                <p class="text-blue-400 font-bold tracking-widest uppercase text-sm mb-2">Chapter 04</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">The "Third Plate" System</h2>
+                <p class="text-slate-300 mb-8 text-lg">
+                    A self-destructing, color-coded windshield sticker provides immediate macro-level environmental data. This enables dynamic urban traffic management (like Delhi's GRAP) without requiring database queries.
+                </p>
+
+                <div class="space-y-4">
+                    <h4 class="font-bold text-white mb-2">1. Select Fuel Type:</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="updateSticker('petrol')" class="px-4 py-2 bg-blue-200 text-blue-900 font-bold rounded hover:bg-blue-300 transition-colors">Petrol/CNG</button>
+                        <button onclick="updateSticker('diesel')" class="px-4 py-2 bg-orange-400 text-orange-900 font-bold rounded hover:bg-orange-500 transition-colors">Diesel</button>
+                        <button onclick="updateSticker('ev')" class="px-4 py-2 bg-stone-400 text-stone-900 font-bold rounded hover:bg-stone-500 transition-colors">EV/Hybrid</button>
+                    </div>
+
+                    <h4 class="font-bold text-white mt-6 mb-2">2. Emission Standard:</h4>
+                    <button id="btn-bs6" onclick="toggleBS6()" class="px-4 py-2 border border-green-500 text-green-400 font-bold rounded hover:bg-green-500 hover:text-white transition-colors flex items-center gap-2">
+                        <span id="bs6-check" class="opacity-0">✓</span> BS-VI Compliant
+                    </button>
+                    <p class="text-sm text-slate-400 mt-2">A 1cm Green Strip denotes compliance with strict Bharat Stage VI emission norms, allowing rapid visual differentiation of clean vehicles.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 5: BH Series -->
+    <section class="py-24 bg-slate-800 reveal">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <div class="text-center mb-16">
+                <p class="text-blue-400 font-bold tracking-widest uppercase text-sm mb-2">Chapter 05</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">The Bharat (BH) Series</h2>
+                <p class="text-slate-300 text-lg max-w-3xl mx-auto">
+                    Introduced in 2021 to eliminate bureaucratic friction for individuals relocating across states. It completely abandons state codes and drastically alters the taxation cadence from a 15-year upfront capitalization to a 2-year recurring model.
+                </p>
+            </div>
+
+            <!-- Structure Breakdown -->
+            <div class="flex justify-center mb-12">
+                <div class="plate-base bg-white text-black plate-font text-3xl md:text-5xl px-8 py-4">
+                    <span class="text-red-600 relative group">25
+                        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs font-sans text-slate-600 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Year (2025)</span>
+                    </span>
+                    <span class="text-blue-600 ml-2 relative group">BH
+                        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs font-sans text-slate-600 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Bharat</span>
+                    </span>
+                    <span class="text-black ml-2 relative group">1234
+                        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs font-sans text-slate-600 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Random</span>
+                    </span>
+                    <span class="text-green-600 ml-2 relative group">XX
+                        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs font-sans text-slate-600 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Category</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-slate-900 p-8 rounded-2xl border border-slate-700">
+                <!-- Calculator Form -->
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4">BH Tax Logic & Eligibility</h3>
+                    <p class="text-sm text-slate-400 mb-6">Eligibility: Govt, Defense, PSU, or Private sector employees with offices in 4+ states. Private vehicles only.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1">Vehicle Invoice Price (₹)</label>
+                            <input type="range" id="invoiceRange" min="500000" max="3000000" step="100000" value="1200000" class="w-full accent-blue-500">
+                            <div class="text-xl font-bold text-teal-300 mt-1">₹<span id="invoiceDisplay">12,00,000</span></div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1">Fuel Modifier</label>
+                            <select id="fuelSelect" class="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white">
+                                <option value="petrol">Petrol / CNG (Base Rate)</option>
+                                <option value="diesel">Diesel (+2% Penalty)</option>
+                                <option value="ev">Electric (-2% Incentive)</option>
+                            </select>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-700">
+                            <p class="text-sm text-slate-400">Standardized National Applicable Tax:</p>
+                            <div class="text-4xl font-extrabold text-white mt-1" id="taxPercentDisplay">10%</div>
+                            <p class="text-xs text-slate-500 mt-2">Collected entirely online in 2-year increments, easing upfront capital burden.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="flex flex-col items-center justify-center">
+                    <h4 class="text-lg font-bold text-slate-300 mb-4 text-center">Conceptual Upfront Capital Outlay</h4>
+                    <div class="chart-container w-full">
+                        <canvas id="bhChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter 6: Military & Special Regimes -->
+    <section class="py-24 px-4 md:px-8 max-w-6xl mx-auto reveal">
+        <p class="text-blue-400 font-bold tracking-widest uppercase text-sm mb-2 text-center">Chapter 06 & 07</p>
+        <h2 class="text-3xl md:text-5xl font-bold mb-12 text-center">Sovereign & Defense Regimes</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Military -->
+            <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700">
+                <h3 class="text-2xl font-bold text-white mb-4">Military Autonomous Registry</h3>
+                <p class="text-slate-400 text-sm mb-6">Exempt from civilian VAHAN registry. Uses the historical Broad Arrow (↑) denoting Ministry of Defence property.</p>
+
+                <div class="plate-base bg-black text-white plate-font text-3xl w-full mb-8 border-stone-600 justify-start px-4">
+                    <span class="text-red-500 mr-2">↑</span>
+                    <span class="text-yellow-400 mr-2">22</span>
+                    <select id="milClassSelect" class="bg-transparent text-blue-400 font-bold appearance-none cursor-pointer outline-none mr-2 border-b border-dashed border-slate-600 pb-1" onchange="updateMilitaryDesc()">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="X" selected>X</option>
+                    </select>
+                    <span>123456</span>
+                    <span class="ml-2 text-stone-400 text-xl flex items-center">H</span>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-lg">
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex text-slate-300"><strong class="w-16 text-white">↑</strong> Broad Arrow (State Property)</li>
+                        <li class="flex text-slate-300"><strong class="w-16 text-white">22</strong> Year of Induction (2022)</li>
+                        <li class="flex text-teal-300 font-bold bg-teal-900/30 p-2 rounded"><strong class="w-16 text-teal-400" id="milLetterDisplay">X</strong> <span id="milDescDisplay">Armored or Combat Vehicles (Tanks)</span></li>
+                        <li class="flex text-slate-300"><strong class="w-16 text-white">123456</strong> Serial Number</li>
+                        <li class="flex text-slate-300"><strong class="w-16 text-white">H</strong> Check Digit</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Diplomatic -->
+            <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Diplomatic Immunities</h3>
+                    <p class="text-slate-400 text-sm mb-6">Overseen by the Ministry of External Affairs (MEA), conferring Vienna Convention sovereign immunities (exempt from searches, localized tolls).</p>
+
+                    <div class="plate-base bg-blue-700 text-white plate-font text-4xl w-full mb-6 border-blue-900">
+                        77 CD 11
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-slate-900 p-3 rounded border border-slate-700 text-center">
+                        <span class="block text-xl font-bold text-blue-400 mb-1">CD</span>
+                        <span class="text-xs text-slate-400 uppercase">Corps Diplomatique</span>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded border border-slate-700 text-center">
+                        <span class="block text-xl font-bold text-blue-400 mb-1">CC</span>
+                        <span class="text-xs text-slate-400 uppercase">Corps Consulaire</span>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded border border-slate-700 text-center">
+                        <span class="block text-xl font-bold text-blue-400 mb-1">UN</span>
+                        <span class="text-xs text-slate-400 uppercase">United Nations</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Chapter 8: Constitutional & Vintage -->
+    <section class="py-24 bg-slate-900 reveal border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+                
+                <!-- Constitutional -->
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Constitutional Authorities</h3>
+                    <p class="text-slate-400 text-sm mb-8">
+                        Historically, vehicles of the President, VP, and Governors used a red plate with only the Gold Ashoka Emblem. Following a 2018 Delhi High Court PIL against "VIP culture" and security risks, they are now mandated to display standard alphanumeric plates.
+                    </p>
+
+                    <div class="h-48 w-full perspective-1000 group cursor-pointer" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card w-full h-full">
+                            <div class="flip-card-inner">
+                                <!-- Front (Pre-2018) -->
+                                <div class="flip-card-front bg-red-700 rounded-xl border-4 border-red-900 flex-col gap-2 shadow-xl">
+                                    <div class="text-4xl">🏛️</div>
+                                    <div class="text-yellow-400 font-serif font-bold tracking-widest uppercase text-sm border-b border-yellow-400/50 pb-1">State Emblem</div>
+                                    <span class="absolute bottom-2 right-4 text-xs text-red-300 font-sans">Pre-2018 (Click to flip)</span>
+                                </div>
+                                <!-- Back (Post-2018) -->
+                                <div class="flip-card-back bg-white rounded-xl border-4 border-slate-800 flex items-center justify-center shadow-xl relative">
+                                    <span class="plate-font text-black text-4xl">DL 1C AA 0001</span>
+                                    <span class="absolute bottom-2 right-4 text-xs text-slate-500 font-sans">Post-2018 Mandate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vintage -->
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Heritage Preservation (VA)</h3>
+                    <p class="text-slate-400 text-sm mb-8">
+                        For vehicles 50+ years old in original factory condition. Commercial use is banned; usage is restricted to exhibitions and maintenance. Imports are now allowed without a license but carry a 5-year lock-in.
+                    </p>
+
+                    <div class="plate-base bg-white text-black plate-font text-4xl w-full py-6 border-slate-300 shadow-inner">
+                        MH <span class="text-red-600 mx-2">VA</span> AB 1965
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6">
+                        <div class="flex-1 bg-slate-800 p-4 rounded text-center border-l-2 border-red-600">
+                            <span class="block text-2xl font-bold text-white">50+</span>
+                            <span class="text-xs text-slate-400 uppercase">Years Old Minimum</span>
+                        </div>
+                        <div class="flex-1 bg-slate-800 p-4 rounded text-center border-l-2 border-red-600">
+                            <span class="block text-2xl font-bold text-white">0</span>
+                            <span class="text-xs text-slate-400 uppercase">Commercial Use</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 text-center border-t border-slate-800">
+        <p class="text-slate-600 text-sm plate-font tracking-widest">DATA STORY // VEHICULAR IDENTIFICATION INFRASTRUCTURE</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // --- 1. Scroll Reveal Logic ---
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Trigger on load
+
+        // --- 2. Capacity Counter Animation ---
+        let countStarted = false;
+        const countObserver = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting && !countStarted) {
+                countStarted = true;
+                animateValue("capacity-counter", 0, 5760000, 2500);
+            }
+        });
+        countObserver.observe(document.getElementById('capacity-counter'));
+
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                // Easing function for smooth slowdown
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const current = Math.floor(easeOutQuart * (end - start) + start);
+                obj.innerHTML = current.toLocaleString('en-IN');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- 3. Anatomy Logic ---
+        const anatomyData = {
+            state: { title: "Macro Geography: State Code", desc: "The first two letters (e.g., DL for Delhi, MH for Maharashtra) designate the State or Union Territory of original registration." },
+            rto: { title: "Micro Geography: RTO Code", desc: "Two digits representing the specific Regional Transport Office. In Delhi, a letter is appended (C=Car, S=Scooter, T=Taxi) to denote vehicle class." },
+            series: { title: "Sequential Counter", desc: "Alphabetical series acting as an overflow counter. Excludes letters 'I' and 'O' to prevent errors in ANPR camera optical character recognition." },
+            num: { title: "Unique Identifier", desc: "A four-digit number from 0001 to 9999. Coveted numbers are withheld and publicly auctioned as 'VIP' numbers for substantial state revenue." }
+        };
+
+        function showAnatomy(part) {
+            const display = document.getElementById('anatomy-display');
+            document.getElementById('ana-title').innerText = anatomyData[part].title;
+            document.getElementById('ana-desc').innerText = anatomyData[part].desc;
+            
+            // Brief highlight effect
+            display.classList.remove('border-blue-500');
+            display.classList.add('border-teal-400', 'bg-slate-800');
+            setTimeout(() => {
+                display.classList.remove('border-teal-400', 'bg-slate-800');
+                display.classList.add('border-blue-500');
+            }, 300);
+        }
+
+        // --- 4. HSRP Logic ---
+        const hsrpData = {
+            hologram: { tag: "Optical Security", title: "Chromium Hologram", desc: "A hot-stamped chromium-based hologram of the Ashoka Chakra. Highly tamper-proof, it destructs if physical removal is attempted." },
+            pin: { tag: "Cryptographic Key", title: "Laser-Engraved PIN", desc: "A permanent 10-digit serial code laser-etched into the reflective sheet. It is digitally linked to the vehicle's internal VIN/Chassis number in the VAHAN database." },
+            snap: { tag: "Physical Anchor", title: "Snap-Lock Fasteners", desc: "Specialized rivets used to affix the plate. They permanently deform or break upon reverse torque, neutralizing unauthorized plate swapping." },
+            emboss: { tag: "Tactile Verification", title: "Hot-Stamped Typography", desc: "Numerals are embossed into the 1.0mm aluminum and hot-stamped with foil bearing a microscopic 'INDIA' inscription inclined at 45 degrees." },
+            rfid: { tag: "Digital Transponder", title: "RFID Integration", desc: "Embedded microchips store encrypted data allowing non-line-of-sight electronic verification by toll booths and police interceptors." }
+        };
+
+        function showHSRP(feature) {
+            document.getElementById('hsrp-default').classList.add('hidden');
+            const content = document.getElementById('hsrp-content');
+            content.classList.remove('hidden');
+            
+            // Reset animation
+            content.style.opacity = 0;
+            content.style.transform = "translateY(10px)";
+            
+            setTimeout(() => {
+                document.getElementById('hsrp-tag').innerText = hsrpData[feature].tag;
+                document.getElementById('hsrp-title').innerText = hsrpData[feature].title;
+                document.getElementById('hsrp-desc').innerText = hsrpData[feature].desc;
+                
+                content.style.transition = "all 0.4s ease";
+                content.style.opacity = 1;
+                content.style.transform = "translateY(0)";
+            }, 50);
+        }
+
+        // --- 5. Third Plate Logic ---
+        let isBS6 = false;
+        function updateSticker(type) {
+            const sticker = document.getElementById('third-plate');
+            sticker.classList.remove('bg-blue-200', 'bg-orange-400', 'bg-stone-400');
+            if(type === 'petrol') sticker.classList.add('bg-blue-200');
+            if(type === 'diesel') sticker.classList.add('bg-orange-400');
+            if(type === 'ev') sticker.classList.add('bg-stone-400');
+        }
+
+        function toggleBS6() {
+            isBS6 = !isBS6;
+            const strip = document.getElementById('bs6-strip');
+            const check = document.getElementById('bs6-check');
+            const btn = document.getElementById('btn-bs6');
+            
+            if(isBS6) {
+                strip.classList.remove('opacity-0');
+                check.classList.remove('opacity-0');
+                btn.classList.add('bg-green-500', 'text-white');
+            } else {
+                strip.classList.add('opacity-0');
+                check.classList.add('opacity-0');
+                btn.classList.remove('bg-green-500', 'text-white');
+            }
+        }
+
+        // --- 6. BH Series Calculator & Chart ---
+        let bhChartInstance = null;
+
+        function calculateBHTax() {
+            const invoice = parseFloat(document.getElementById('invoiceRange').value);
+            const fuel = document.getElementById('fuelSelect').value;
+            
+            // Update display
+            document.getElementById('invoiceDisplay').innerText = invoice.toLocaleString('en-IN');
+
+            // Calculate Base %
+            let basePercent = 8;
+            if (invoice >= 1000000 && invoice <= 2000000) basePercent = 10;
+            if (invoice > 2000000) basePercent = 12;
+
+            // Apply Modifiers
+            if (fuel === 'diesel') basePercent += 2;
+            if (fuel === 'ev') basePercent -= 2;
+
+            document.getElementById('taxPercentDisplay').innerText = basePercent + '%';
+
+            // Calculate hypothetical amounts for chart
+            const totalTax = invoice * (basePercent / 100);
+            const standard15YrUpfront = totalTax; 
+            // The exact 2-yr formula is complex, but conceptually it is roughly total / 7.5. 
+            // We use a simplified conceptual representation for the chart to show "Upfront burden vs BH burden"
+            const conceptual2YrInstallment = totalTax / 7.5; 
+
+            updateBHChart(standard15YrUpfront, conceptual2YrInstallment);
+        }
+
+        function initBHChart() {
+            const ctx = document.getElementById('bhChart').getContext('2d');
+            bhChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Standard Registration', 'BH Series'],
+                    datasets: [{
+                        label: 'Upfront Tax Payment (₹)',
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.8)', // Red for high upfront
+                            'rgba(56, 189, 248, 0.8)'  // Blue for low initial
+                        ],
+                        borderColor: ['#ef4444', '#38bdf8'],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹ ' + context.parsed.y.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' }
+                        },
+                        x: {
+                            ticks: { color: '#f8fafc', font: { weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateBHChart(val15, val2) {
+            if(!bhChartInstance) return;
+            bhChartInstance.data.datasets[0].data = [val15, val2];
+            bhChartInstance.update();
+        }
+
+        // Listeners for BH Calculator
+        document.getElementById('invoiceRange').addEventListener('input', calculateBHTax);
+        document.getElementById('fuelSelect').addEventListener('change', calculateBHTax);
+
+        // --- 7. Military Decoder ---
+        const milClasses = {
+            A: "Motorized Two-Wheelers (Dispatch motorcycles)",
+            B: "Light Motor Vehicles (Cars/Gypsys)",
+            C: "Light Trucks (Payload < 3 tonnes)",
+            D: "Medium Trucks (Payload 3-5 tonnes)",
+            X: "Armored or Combat Vehicles (Main Battle Tanks)"
+        };
+
+        function updateMilitaryDesc() {
+            const val = document.getElementById('milClassSelect').value;
+            document.getElementById('milLetterDisplay').innerText = val;
+            document.getElementById('milDescDisplay').innerText = milClasses[val];
+        }
+
+        // Initialize things
+        window.onload = () => {
+            initBHChart();
+            calculateBHTax();
+        };
+
+    </script>
+</body>
+</html>
