@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Air Force: Strategic Analysis & Operational Dynamics</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Chosen Palette: Strategic Navy, Slate Gray, and Sky Blue Accent -->
+    <!-- Application Structure Plan: A highly structured "scrollytelling" data story. 
+         - Architecture: A persistent side-navigation (or top progress bar) guides the user through distinct strategic themes: Executive Summary, Genesis, Command Architecture, Human Capital, Fleet Modernization, and Contemporary Operations (2025-2026).
+         - Justification: The McKinsey aesthetic demands a clean, linear narrative flow combined with "drill-down" interactive elements. Instead of overwhelming the user with a wall of text, dense information (like the extensive rank hierarchy and fleet details) is encapsulated in interactive tabs and accordions. This maintains a clean UI while ensuring zero information loss. Scroll animations keep the user engaged.
+    -->
+    <!-- Visualization & Content Choices: 
+         - The Squadron Conundrum: Goal: Highlight the capability gap -> Viz: Bar Chart (Chart.js) -> Interaction: Hover for exact numbers -> Justification: Clearest way to show the deficit between authorized and actual strength.
+         - Gender Parity: Goal: Compare IAF female integration with other branches -> Viz: Horizontal Bar Chart (Chart.js) -> Justification: Directly visualizes the percentage disparities mentioned in the report.
+         - Command Architecture: Goal: Show geographic spread -> Viz: Interactive CSS Grid/Cards -> Interaction: Click/Hover to reveal strategic focus -> Justification: Avoids SVGs while providing a spatial/functional breakdown.
+         - NO SVG/Mermaid used. All styling relies on Tailwind CSS, HTML elements, Unicode, and Canvas.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        mckinsey: { navy: '#051c2c', blue: '#00548f', light: '#f4f6f8', gray: '#5f6368' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #ffffff; color: #1f2937; }
+        
+        /* Smooth Scroll & Hide Scrollbar */
+        html { scroll-behavior: smooth; scrollbar-width: none; }
+        html::-webkit-scrollbar { display: none; }
+
+        /* Animation Classes */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+
+        /* Chart Container Strict Rules */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+
+        /* Reading Progress */
+        #progress-bar {
+            position: fixed; top: 0; left: 0; height: 4px; background: #00548f; z-index: 100; transition: width 0.1s;
+        }
+
+        /* Typography Enhancements */
+        .drop-cap::first-letter {
+            font-size: 3.5rem; font-weight: bold; float: left; margin-right: 0.5rem; line-height: 1; color: #051c2c;
+        }
+
+        /* Tab System */
+        .tab-content { display: none; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <div id="progress-bar"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md border-b border-gray-200 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl" aria-hidden="true">&#9992;&#65039;</span>
+                    <span class="font-bold text-xl tracking-tight text-mckinsey-navy">Strategic Insights</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-semibold text-gray-600">
+                    <a href="#executive-summary" class="hover:text-mckinsey-blue transition">Summary</a>
+                    <a href="#genesis" class="hover:text-mckinsey-blue transition">Genesis</a>
+                    <a href="#organization" class="hover:text-mckinsey-blue transition">Architecture</a>
+                    <a href="#human-capital" class="hover:text-mckinsey-blue transition">Human Capital</a>
+                    <a href="#modernization" class="hover:text-mckinsey-blue transition">Modernization</a>
+                    <a href="#operations" class="hover:text-mckinsey-blue transition">Operations</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-mckinsey-navy text-white pt-32 pb-24 px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+        <div class="max-w-4xl reveal active">
+            <p class="text-mckinsey-blue font-bold tracking-widest uppercase mb-4 text-sky-400">Strategic Report 2025-2026</p>
+            <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+                The Aerospace Imperative:<br>
+                <span class="text-gray-300 font-light">Analyzing the Indian Air Force</span>
+            </h1>
+            <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto font-light">
+                An exhaustive examination of the world's fourth-largest air force—its historical genesis, structural evolution, and the contemporary operational dynamics defining its mandate.
+            </p>
+            <div class="flex flex-wrap justify-center gap-6 mt-8">
+                <div class="bg-white/10 px-6 py-4 rounded-sm border-l-4 border-sky-400 text-left">
+                    <div class="text-3xl font-bold">1,750+</div>
+                    <div class="text-sm text-gray-300 uppercase tracking-wide">Active Aircraft</div>
+                </div>
+                <div class="bg-white/10 px-6 py-4 rounded-sm border-l-4 border-sky-400 text-left">
+                    <div class="text-3xl font-bold">135,000</div>
+                    <div class="text-sm text-gray-300 uppercase tracking-wide">Active Personnel</div>
+                </div>
+                <div class="bg-white/10 px-6 py-4 rounded-sm border-l-4 border-sky-400 text-left">
+                    <div class="text-3xl font-bold">4th</div>
+                    <div class="text-sm text-gray-300 uppercase tracking-wide">Largest Globally</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-32">
+
+        <!-- Executive Summary -->
+        <section id="executive-summary" class="reveal">
+            <div class="border-t-4 border-mckinsey-blue w-16 mb-6"></div>
+            <h2 class="text-3xl font-bold text-mckinsey-navy mb-8">Executive Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <p class="text-lg text-gray-700 leading-relaxed drop-cap mb-6">
+                        The Indian Air Force (IAF), officially designated as the <em>Bhāratīya Vāyu Senā</em>, functions as the primary instrument of Indian kinetic and diplomatic statecraft. Operating under a complex dual-threat paradigm along its western (Pakistan) and northern/eastern (China) frontiers, the force ensures sovereign airspace security and projects overwhelming aerial capabilities.
+                    </p>
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        Beyond core kinetic warfare, the IAF provides vital strategic airlift, high-altitude logistics, and Humanitarian Assistance and Disaster Relief (HADR) across the Indo-Pacific region.
+                    </p>
+                </div>
+                <div class="bg-mckinsey-light p-8 rounded-sm">
+                    <h3 class="text-xl font-bold text-mckinsey-navy mb-4 flex items-center"><span class="mr-2">&#9878;&#65039;</span> The Philosophical Ethos</h3>
+                    <p class="text-gray-700 mb-4">
+                        The IAF's motto, <strong>"Touch the Sky with Glory"</strong> (<em>Nabhaḥ Spr̥śaṁ Dīptam</em>), originates from Chapter 11, Verse 24 of the Bhagavad Gita. It describes Lord Krishna's terrifying, overwhelming cosmic form. This strategically aligns the IAF's doctrine with the projection of awe-inspiring, paralyzing aerospace power.
+                    </p>
+                    <h3 class="text-xl font-bold text-mckinsey-navy mb-2 mt-6 flex items-center"><span class="mr-2">&#129489;&#8205;&#9992;&#65039;</span> The 45-Degree Salute</h3>
+                    <p class="text-gray-700 text-sm">
+                        Redesigned in 2006, the IAF salute places the open palm at exactly a 45-degree angle to the ground. This biomechanical trajectory physically manifests progress towards the skies (aircraft takeoff), distinguishing it from the Army (forward-facing) and Navy (downward-facing).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Genesis & History -->
+        <section id="genesis" class="reveal">
+            <div class="border-t-4 border-mckinsey-blue w-16 mb-6"></div>
+            <h2 class="text-3xl font-bold text-mckinsey-navy mb-4">Historical Genesis</h2>
+            <p class="text-gray-600 mb-12 max-w-3xl text-lg">From a colonial auxiliary unit to a network-centric aerospace power, the IAF's trajectory is deeply entwined with India's strategic autonomy.</p>
+            
+            <div class="relative border-l border-gray-300 ml-3 md:ml-6 space-y-10">
+                <!-- Timeline Item 1 -->
+                <div class="relative pl-8 md:pl-12 reveal delay-100">
+                    <div class="absolute -left-3 top-1 w-6 h-6 bg-mckinsey-blue rounded-full border-4 border-white shadow"></div>
+                    <div class="text-sm font-bold text-mckinsey-blue tracking-widest mb-1">1932</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Establishment & Early Skepticism</h3>
+                    <p class="text-gray-700">Founded on October 8 with 6 RAF-trained Indian officers and 29 'havai sepoys' operating four Westland Wapiti biplanes. Survived early colonial skepticism regarding Indian aviation capabilities.</p>
+                </div>
+                <!-- Timeline Item 2 -->
+                <div class="relative pl-8 md:pl-12 reveal delay-100">
+                    <div class="absolute -left-3 top-1 w-6 h-6 bg-mckinsey-blue rounded-full border-4 border-white shadow"></div>
+                    <div class="text-sm font-bold text-mckinsey-blue tracking-widest mb-1">1939 - 1945</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Crucible of WWII & the "Royal" Prefix</h3>
+                    <p class="text-gray-700">Indian pilots played crucial roles halting Japanese advances in Arakan and Imphal. Awarded the prefix "Royal" in 1945, later dropped when India became a Republic in 1950.</p>
+                </div>
+                <!-- Timeline Item 3 -->
+                <div class="relative pl-8 md:pl-12 reveal delay-200">
+                    <div class="absolute -left-3 top-1 w-6 h-6 bg-mckinsey-blue rounded-full border-4 border-white shadow"></div>
+                    <div class="text-sm font-bold text-mckinsey-blue tracking-widest mb-1">1954 & The Great Conflicts</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Indigenization & Decisive Warfare</h3>
+                    <p class="text-gray-700">Air Marshal Subroto Mukherjee became the first Indian Chief of Air Staff (1954). The IAF subsequently proved vital in the 1965 war and the decisive 1971 liberation of Bangladesh.</p>
+                </div>
+                <!-- Timeline Item 4 -->
+                <div class="relative pl-8 md:pl-12 reveal delay-200">
+                    <div class="absolute -left-3 top-1 w-6 h-6 bg-mckinsey-blue rounded-full border-4 border-white shadow"></div>
+                    <div class="text-sm font-bold text-mckinsey-blue tracking-widest mb-1">1999</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Kargil War (Op Safed Sagar)</h3>
+                    <p class="text-gray-700">Executed unprecedented high-altitude precision strikes, adapting traditional jets for extreme elevations, proving air power viability in mountainous terrain.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Command Architecture -->
+        <section id="organization" class="reveal">
+            <div class="border-t-4 border-mckinsey-blue w-16 mb-6"></div>
+            <h2 class="text-3xl font-bold text-mckinsey-navy mb-4">Organizational Architecture</h2>
+            <p class="text-gray-600 mb-8 max-w-3xl text-lg">Commanded by the Chief of the Air Staff (Air Chief Marshal Amar Preet Singh as of 2025), the IAF maintains agility across a vast geography via 5 Operational and 2 Functional Commands.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards -->
+                <div class="p-6 border border-gray-200 hover:shadow-lg transition bg-white group cursor-default">
+                    <h4 class="font-bold text-mckinsey-navy text-lg group-hover:text-mckinsey-blue">Western Air Command (WAC)</h4>
+                    <p class="text-sm text-sky-600 font-semibold mb-3">HQ: New Delhi</p>
+                    <p class="text-gray-600 text-sm">Largest command (16 bases). Crucial for countering Pakistan and managing contested northern borders.</p>
+                </div>
+                <div class="p-6 border border-gray-200 hover:shadow-lg transition bg-white group cursor-default">
+                    <h4 class="font-bold text-mckinsey-navy text-lg group-hover:text-mckinsey-blue">Eastern Air Command (EAC)</h4>
+                    <p class="text-sm text-sky-600 font-semibold mb-3">HQ: Shillong, Meghalaya</p>
+                    <p class="text-gray-600 text-sm">Primary bulwark against Chinese aerial incursions along the Line of Actual Control (LAC) with 15 bases.</p>
+                </div>
+                <div class="p-6 border border-gray-200 hover:shadow-lg transition bg-white group cursor-default">
+                    <h4 class="font-bold text-mckinsey-navy text-lg group-hover:text-mckinsey-blue">Central Air Command (CAC)</h4>
+                    <p class="text-sm text-sky-600 font-semibold mb-3">HQ: Prayagraj, UP</p>
+                    <p class="text-gray-600 text-sm">Strategic depth command; major hub for transport, logistics, and heavy airlift.</p>
+                </div>
+                <div class="p-6 border border-gray-200 hover:shadow-lg transition bg-white group cursor-default">
+                    <h4 class="font-bold text-mckinsey-navy text-lg group-hover:text-mckinsey-blue">Southern Air Command (SAC)</h4>
+                    <p class="text-sm text-sky-600 font-semibold mb-3">HQ: Thiruvananthapuram, Kerala</p>
+                    <p class="text-gray-600 text-sm">Protects IOR shipping routes and conducts maritime strike ops across 11 bases.</p>
+                </div>
+                <div class="p-6 border border-gray-200 hover:shadow-lg transition bg-white group cursor-default">
+                    <h4 class="font-bold text-mckinsey-navy text-lg group-hover:text-mckinsey-blue">South Western Air Command</h4>
+                    <p class="text-sm text-sky-600 font-semibold mb-3">HQ: Gandhinagar, Gujarat</p>
+                    <p class="text-gray-600 text-sm">Frontline defense against Pakistan in the western desert and maritime borders.</p>
+                </div>
+                <div class="p-6 border border-gray-200 hover:shadow-lg transition bg-mckinsey-light group cursor-default flex flex-col justify-center">
+                    <h4 class="font-bold text-mckinsey-navy text-lg border-b border-gray-300 pb-2 mb-2">Functional Commands</h4>
+                    <p class="text-gray-700 text-sm mb-2"><strong>Training (TC):</strong> Bengaluru. Foundational & flight training.</p>
+                    <p class="text-gray-700 text-sm"><strong>Maintenance (MC):</strong> Nagpur. Logistics, repair, and supply chain.</p>
+                </div>
+            </div>
+            
+            <div class="mt-6 bg-slate-800 text-white p-4 rounded-sm flex items-center">
+                <span class="text-2xl mr-4">&#127758;</span>
+                <p class="text-sm"><strong>Extraterritorial Reach:</strong> The IAF operates its only foreign air base, the Farkhor Air Base in Tajikistan, providing strategic depth in Central Asia.</p>
+            </div>
+        </section>
+
+        <!-- Human Capital & Ranks -->
+        <section id="human-capital" class="reveal">
+            <div class="border-t-4 border-mckinsey-blue w-16 mb-6"></div>
+            <h2 class="text-3xl font-bold text-mckinsey-navy mb-4">Human Capital & Demographics</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-8">
+                <!-- Gender Parity Chart -->
+                <div class="bg-white p-6 border border-gray-200 shadow-sm">
+                    <h3 class="text-xl font-bold text-mckinsey-navy mb-2">The Demographic Transformation</h3>
+                    <p class="text-gray-600 text-sm mb-6">Percentage of women integration across Indian Armed Forces (2024-2026 data).</p>
+                    
+                    <div class="chart-container">
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                    
+                    <p class="text-sm text-gray-600 mt-6 pt-4 border-t border-gray-100">
+                        The IAF eradicated the combat glass ceiling in 2022. Trailblazers include Sqn Ldr Bhawana Kanth, Sqn Ldr Avani Chaturvedi (Su-30MKI foreign wargames), and Sqn Ldr Shivangi Singh (Rafale pilot).
+                    </p>
+                </div>
+
+                <!-- Ranks & Training Interactive -->
+                <div>
+                    <h3 class="text-xl font-bold text-mckinsey-navy mb-4">Officer Cadre & Architecture</h3>
+                    <p class="text-gray-600 text-sm mb-4">Aspirants enter via NDA, AFCAT, or CDS into Flying, Technical, or Non-Technical branches. Select a rank category below to explore the NATO-equivalent hierarchy.</p>
+                    
+                    <!-- Tabs UI -->
+                    <div class="flex border-b border-gray-300 mb-4">
+                        <button class="rank-tab px-4 py-2 font-semibold text-mckinsey-blue border-b-2 border-mckinsey-blue" data-target="ranks-flag">Flag Ranks</button>
+                        <button class="rank-tab px-4 py-2 font-semibold text-gray-500 border-b-2 border-transparent hover:text-mckinsey-navy" data-target="ranks-senior">Senior</button>
+                        <button class="rank-tab px-4 py-2 font-semibold text-gray-500 border-b-2 border-transparent hover:text-mckinsey-navy" data-target="ranks-junior">Junior & PBOR</button>
+                    </div>
+
+                    <!-- Tab Contents -->
+                    <div id="ranks-flag" class="tab-content active space-y-3">
+                        <div class="bg-amber-50 p-3 border-l-4 border-amber-500">
+                            <span class="font-bold text-amber-900">Marshal of the IAF (OF-10)</span>
+                            <p class="text-xs text-amber-800 mt-1">Five-star. Held only once by Arjan Singh for 1965 war leadership.</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Air Chief Marshal (OF-9)</span>
+                            <p class="text-xs text-gray-600 mt-1">Four-star. Chief of the Air Staff (CAS).</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Air Marshal (OF-8)</span>
+                            <p class="text-xs text-gray-600 mt-1">Three-star. Commands operational Air Commands (AOC-in-C).</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Air Vice Marshal (OF-7)</span>
+                            <p class="text-xs text-gray-600 mt-1">Two-star. Regional HQ command.</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Air Commodore (OF-6)</span>
+                            <p class="text-xs text-gray-600 mt-1">One-star. Commands large regional air wings.</p>
+                        </div>
+                    </div>
+
+                    <div id="ranks-senior" class="tab-content space-y-3">
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Group Captain (OF-5)</span>
+                            <p class="text-xs text-gray-600 mt-1">Equivalent to Army Colonel. Commands major airbases.</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Wing Commander (OF-4)</span>
+                            <p class="text-xs text-gray-600 mt-1">Equivalent to Army Lt. Col. Commands combat squadrons.</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Squadron Leader (OF-3)</span>
+                            <p class="text-xs text-gray-600 mt-1">Commands Flights within a squadron.</p>
+                        </div>
+                    </div>
+
+                    <div id="ranks-junior" class="tab-content space-y-3">
+                        <div class="bg-gray-50 p-3 border border-gray-200">
+                            <span class="font-bold text-mckinsey-navy">Flight Lieutenant (OF-2) & Flying Officer (OF-1)</span>
+                            <p class="text-xs text-gray-600 mt-1">Experienced and entry-level commissioned officers.</p>
+                        </div>
+                        <div class="bg-mckinsey-light p-3 border-l-4 border-gray-400 mt-4">
+                            <span class="font-bold text-gray-800">Personnel Below Officer Rank (PBOR)</span>
+                            <p class="text-xs text-gray-600 mt-1">Warrant Officers (JCOs), Sergeants, Corporals, and Aircraftsmen. The technical backbone of the force.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modernization & The Squadron Conundrum -->
+        <section id="modernization" class="reveal">
+            <div class="border-t-4 border-mckinsey-blue w-16 mb-6"></div>
+            <h2 class="text-3xl font-bold text-mckinsey-navy mb-4">Fleet Modernization & The Squadron Conundrum</h2>
+            <p class="text-gray-600 mb-8 max-w-3xl text-lg">The most pressing strategic challenge is managing combat squadron strength amidst fleet obsolescence and delayed procurement cycles.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+                
+                <!-- Squadron Chart -->
+                <div class="md:col-span-5 bg-white p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-mckinsey-navy text-center mb-2">Combat Squadron Strength</h3>
+                    <p class="text-xs text-gray-500 text-center mb-4">Mandated to deter a two-front war vs Current Active.</p>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="squadronChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-4">
+                        <em>Note: Data reflects late 2024/2025 estimates following the retirement of legacy MiG-21 fleets. Comparatively, PAF possesses ~25 squadrons, while China operates ~66.</em>
+                    </p>
+                </div>
+
+                <!-- Aircraft details -->
+                <div class="md:col-span-7 space-y-4">
+                    <h3 class="text-xl font-bold text-mckinsey-navy mb-4 border-b pb-2">Strategic Procurement Vectors</h3>
+                    
+                    <div class="border border-gray-200 p-4 hover:bg-gray-50 transition cursor-default">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-lg text-mckinsey-blue">Indigenous Fighters (Tejas & AMCA)</h4>
+                            <span class="text-xs font-bold px-2 py-1 bg-sky-100 text-sky-800 rounded">Bedrock</span>
+                        </div>
+                        <p class="text-sm text-gray-700">141 Tejas Mk1A ordered (AESA radar, EW suites). The 5th Gen stealth AMCA program received CCS approval in 2024, targeting induction in the 2030s.</p>
+                    </div>
+
+                    <div class="border border-gray-200 p-4 hover:bg-gray-50 transition cursor-default">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-lg text-mckinsey-blue">High-End Combat (Rafale & Su-30MKI)</h4>
+                            <span class="text-xs font-bold px-2 py-1 bg-red-100 text-red-800 rounded">Spearhead</span>
+                        </div>
+                        <p class="text-sm text-gray-700">36 Dassault Rafales form the elite strike force. The 265 Su-30MKIs are undergoing the "Super Sukhoi" upgrade. MRFA program (114 jets) remains active.</p>
+                    </div>
+
+                    <div class="border border-gray-200 p-4 hover:bg-gray-50 transition cursor-default">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-lg text-mckinsey-blue">Transport & Autonomous Systems</h4>
+                            <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-800 rounded">Logistics/Future</span>
+                        </div>
+                        <p class="text-sm text-gray-700">56 C-295s inducting (40 built in India by Tata). 2025's "Unmanned Force Plan" initiated $4.2B MQ-9B drone deal and Ghatak UCAV development.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Contemporary Operations -->
+        <section id="operations" class="reveal mb-24">
+            <div class="border-t-4 border-mckinsey-blue w-16 mb-6"></div>
+            <h2 class="text-3xl font-bold text-mckinsey-navy mb-4">Contemporary Operations (2025-2026)</h2>
+            <p class="text-gray-600 mb-8 max-w-3xl text-lg">Recent high-stakes environments demonstrate a shift toward multi-domain operations, precision strikes, and electronic warfare.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Op Sindoor -->
+                <div class="bg-mckinsey-navy text-white p-8 rounded-sm shadow-xl">
+                    <div class="uppercase tracking-widest text-sky-400 text-sm font-bold mb-2">May 2025</div>
+                    <h3 class="text-2xl font-bold mb-4">Operation Sindoor</h3>
+                    <p class="text-gray-300 mb-4 text-sm leading-relaxed">
+                        A calibrated kinetic strike targeting militant infrastructure in PoK and Punjab following terror provocations.
+                    </p>
+                    <ul class="space-y-3 text-sm text-gray-300 mb-6">
+                        <li class="flex items-start"><span class="text-sky-400 mr-2">&#10003;</span> Employed air-launched BrahMos and SCALP-EG missiles.</li>
+                        <li class="flex items-start"><span class="text-sky-400 mr-2">&#10003;</span> S-400 "Sudarshan" neutralized retaliatory strikes, destroying 5-6 adversary fighters and a spy plane ~300km deep.</li>
+                        <li class="flex items-start"><span class="text-sky-400 mr-2">&#10003;</span> Navigated intense Info-Warfare (deepfakes, false AI footage) maintaining strict operational discipline.</li>
+                    </ul>
+                </div>
+
+                <!-- Op Brahma & Exercises -->
+                <div class="space-y-6">
+                    <div class="border border-gray-200 p-6 bg-white hover:border-mckinsey-blue transition">
+                        <div class="uppercase tracking-widest text-mckinsey-blue text-xs font-bold mb-1">Mar-Apr 2025</div>
+                        <h3 class="text-xl font-bold text-mckinsey-navy mb-2">Operation Brahma & EW</h3>
+                        <p class="text-gray-600 text-sm">
+                            Massive HADR mission post-Myanmar earthquake (airlifting 656 MT relief via C-130J/C-17). Pilots faced intense <strong>GPS Spoofing</strong> cyberattacks, forcing reliance on internal navigation systems—highlighting contested peacetime airspace.
+                        </p>
+                    </div>
+
+                    <div class="border border-gray-200 p-6 bg-white hover:border-mckinsey-blue transition">
+                        <div class="uppercase tracking-widest text-mckinsey-blue text-xs font-bold mb-1">Global Interoperability</div>
+                        <h3 class="text-xl font-bold text-mckinsey-navy mb-2">Diplomacy & Exercises</h3>
+                        <p class="text-gray-600 text-sm">
+                            Hosting <strong>Tarang Shakti</strong> (largest multilateral drill), participating in Ex Garuda (France), Cope India (US), and the Feb 2026 In-Situ Joint Air Exercise with Thailand near the Malacca Strait.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-mckinsey-navy text-gray-400 py-12 text-center text-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <span class="text-2xl block mb-4" aria-hidden="true">&#9992;&#65039;</span>
+            <p>Based on the Comprehensive Strategic Analysis of the Indian Air Force (2025-2026).</p>
+            <p class="mt-2 text-xs">Stylized for analytical presentation. Data derived from official structural reports.</p>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic & Visualization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 1. Reading Progress Bar
+            window.addEventListener('scroll', () => {
+                const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (winScroll / height) * 100;
+                document.getElementById('progress-bar').style.width = scrolled + '%';
+            });
+
+            // 2. Scroll Animation (Intersection Observer)
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+
+            // 3. Tab Interaction Logic (Ranks)
+            const rankTabs = document.querySelectorAll('.rank-tab');
+            const rankContents = document.querySelectorAll('.tab-content');
+
+            rankTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-target');
+                    
+                    // Reset Tabs
+                    rankTabs.forEach(t => {
+                        t.classList.remove('border-mckinsey-blue', 'text-mckinsey-blue');
+                        t.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    // Set Active Tab
+                    tab.classList.remove('border-transparent', 'text-gray-500');
+                    tab.classList.add('border-mckinsey-blue', 'text-mckinsey-blue');
+
+                    // Switch Content
+                    rankContents.forEach(c => c.classList.remove('active'));
+                    document.getElementById(target).classList.add('active');
+                });
+            });
+
+            // 4. Chart.js Configurations
+
+            // Global Defaults for McKinsey aesthetic
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#5f6368';
+            Chart.defaults.scale.grid.color = '#f0f0f0';
+
+            // Chart A: The Squadron Conundrum
+            const ctxSquadron = document.getElementById('squadronChart').getContext('2d');
+            new Chart(ctxSquadron, {
+                type: 'bar',
+                data: {
+                    labels: ['Authorized Strength', 'Current Active (Est.)'],
+                    datasets: [{
+                        label: 'Combat Squadrons',
+                        data: [42, 29],
+                        backgroundColor: [
+                            '#051c2c', // mckinsey navy
+                            '#00548f'  // mckinsey blue
+                        ],
+                        borderWidth: 0,
+                        barThickness: 50
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Required for strict container height
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#051c2c',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 16, weight: 'bold' },
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: (context) => `${context.raw} Squadrons`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 50,
+                            grid: { drawBorder: false },
+                            ticks: { stepSize: 10 }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: { weight: '600' } }
+                        }
+                    }
+                }
+            });
+
+            // Chart B: Gender Parity
+            const ctxGender = document.getElementById('genderChart').getContext('2d');
+            new Chart(ctxGender, {
+                type: 'bar',
+                data: {
+                    labels: ['Indian Air Force', 'Indian Army', 'Indian Navy'],
+                    datasets: [{
+                        label: '% Women Integration',
+                        data: [13.4, 6.85, 6.0],
+                        backgroundColor: [
+                            '#00548f', // Highlight IAF
+                            '#cbd5e1', // Muted others
+                            '#cbd5e1'
+                        ],
+                        borderRadius: 4,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bar chart
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#051c2c',
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: (context) => `${context.raw}% Representation`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true, 
+                            max: 15,
+                            grid: { drawBorder: false },
+                            ticks: { callback: (val) => val + '%' }
+                        },
+                        y: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: { weight: '600' }, color: '#051c2c' }
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Human 2030: An Interactive Data Story</title>
+    
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for Editorial Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Feather Icons for lightweight iconography -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* Custom Theme & Typography */
+        :root {
+            --brand-cyan: #22d3ee;
+            --brand-purple: #c084fc;
+            --brand-rose: #fb7185;
+            --brand-emerald: #34d399;
+            --brand-blue: #60a5fa;
+            --brand-green: #4ade80;
+            --brand-orange: #fb923c;
+            --brand-yellow: #facc15;
+            --brand-indigo: #818cf8;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #0f172a; /* slate-900 */
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-serif-display { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        /* Scrollytelling Mechanics */
+        .step-card {
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            opacity: 0.15;
+            transform: translateY(30px);
+        }
+        .step-card.is-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* SVG Visualization Transitions */
+        svg * {
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .viz-group {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .viz-group.active-state {
+            opacity: 1;
+        }
+
+        /* Specific Animation States */
+        /* Macro */
+        #viz-macro circle.ring { r: 50; }
+        #viz-macro.active-state circle.ring { r: 250; }
+        #viz-macro circle.dashed-ring { r: 0; }
+        #viz-macro.active-state circle.dashed-ring { r: 150; }
+        
+        /* Network */
+        #viz-network line { stroke-dasharray: 500; stroke-dashoffset: 500; }
+        #viz-network.active-state line { stroke-dashoffset: 0; }
+        #viz-network circle.node { r: 0; }
+        #viz-network.active-state circle.node { r: 35; }
+        
+        /* UHI Architecture */
+        #viz-uhi .walled-garden { transform: translateX(-50px); }
+        #viz-uhi.active-state .walled-garden { transform: translateX(0); }
+        #viz-uhi .open-protocol { transform: translateX(50px); }
+        #viz-uhi.active-state .open-protocol { transform: translateX(0); }
+        
+        /* Bar Race */
+        #viz-bar-race rect.bar { width: 0; }
+        #viz-bar-race.active-state rect.bar-reliance { width: 400px; }
+        #viz-bar-race.active-state rect.bar-adani { width: 360px; }
+        #viz-bar-race.active-state rect.bar-swadeshi { width: 150px; }
+
+        /* Mandala */
+        #viz-mandala circle.outer-ring { r: 60; }
+        #viz-mandala.active-state circle.outer-ring { r: 260; }
+
+        /* Responsive Layout Tweaks */
+        @media (max-width: 768px) {
+            #graphic-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: 0;
+            }
+            #text-container {
+                position: relative;
+                z-index: 10;
+                padding-top: 50vh;
+            }
+            .step-card {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(0,0,0,0.05);
+            }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-200 selection:text-slate-900">
+
+    <!-- Header -->
+    <header class="w-full border-b border-slate-200 py-5 px-8 flex justify-between items-center bg-white sticky top-0 z-50">
+        <div class="text-2xl font-black font-serif-display tracking-tight">The Data Chronicle</div>
+        <div class="text-xs font-mono text-slate-500 uppercase tracking-widest hidden md:block">Special Report: The Digital Human 2030</div>
+    </header>
+
+    <main class="flex flex-col md:flex-row w-full relative">
+        
+        <!-- LEFT: Fixed Visualization Canvas -->
+        <section id="graphic-container" class="w-full md:w-[55%] h-[50vh] md:h-screen sticky top-0 bg-slate-950 flex items-center justify-center overflow-hidden border-r border-slate-800">
+            <!-- Grid Background -->
+            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0); background-size: 40px 40px;"></div>
+            
+            <svg id="viz-canvas" width="100%" height="100%" viewBox="0 0 800 800" class="relative z-10 w-full max-w-2xl">
+                <defs>
+                    <radialGradient id="glowCyan" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="rgba(34, 211, 238, 0.3)" />
+                        <stop offset="100%" stop-color="rgba(34, 211, 238, 0)" />
+                    </radialGradient>
+                    <radialGradient id="glowPurple" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="rgba(192, 132, 252, 0.3)" />
+                        <stop offset="100%" stop-color="rgba(192, 132, 252, 0)" />
+                    </radialGradient>
+                </defs>
+
+                <!-- 1. MACRO -->
+                <g id="viz-macro" class="viz-group">
+                    <circle cx="400" cy="400" r="50" fill="url(#glowCyan)" class="ring" />
+                    <circle cx="400" cy="400" r="0" class="dashed-ring stroke-cyan-400 stroke-[2px] fill-transparent" stroke-dasharray="8 8" />
+                    <text x="400" y="415" text-anchor="middle" class="fill-white text-5xl font-bold font-mono tracking-tighter">$800B</text>
+                    <text x="400" y="450" text-anchor="middle" class="fill-cyan-400 text-sm tracking-widest uppercase font-mono">India App Economy</text>
+                    <circle cx="400" cy="150" r="6" class="fill-cyan-300 ring-particle" />
+                    <circle cx="650" cy="400" r="6" class="fill-cyan-300 ring-particle" />
+                    <circle cx="400" cy="650" r="6" class="fill-cyan-300 ring-particle" />
+                    <circle cx="150" cy="400" r="6" class="fill-cyan-300 ring-particle" />
+                </g>
+
+                <!-- 2. NETWORK -->
+                <g id="viz-network" class="viz-group">
+                    <circle cx="400" cy="400" r="120" fill="url(#glowPurple)" />
+                    <circle cx="400" cy="400" r="80" class="fill-purple-600" />
+                    <text x="400" y="406" text-anchor="middle" class="fill-white text-xl font-bold font-serif-display tracking-widest">AI AGENT</text>
+                    
+                    <!-- Nodes -->
+                    <g transform="translate(400, 400)">
+                        <line x1="0" y1="0" x2="160" y2="-160" class="stroke-purple-500 stroke-[2px] opacity-50" />
+                        <circle cx="160" cy="-160" r="0" class="node fill-slate-900 stroke-purple-400 stroke-[2px]" />
+                        <text x="160" y="-155" text-anchor="middle" class="fill-white text-xs font-mono">FINANCE</text>
+
+                        <line x1="0" y1="0" x2="-160" y2="-160" class="stroke-purple-500 stroke-[2px] opacity-50" />
+                        <circle cx="-160" cy="-160" r="0" class="node fill-slate-900 stroke-purple-400 stroke-[2px]" />
+                        <text x="-160" y="-155" text-anchor="middle" class="fill-white text-xs font-mono">HEALTH</text>
+
+                        <line x1="0" y1="0" x2="-140" y2="140" class="stroke-purple-500 stroke-[2px] opacity-50" />
+                        <circle cx="-140" cy="140" r="0" class="node fill-slate-900 stroke-purple-400 stroke-[2px]" />
+                        <text x="-140" y="145" text-anchor="middle" class="fill-white text-xs font-mono">WORK</text>
+
+                        <line x1="0" y1="0" x2="140" y2="140" class="stroke-purple-500 stroke-[2px] opacity-50" />
+                        <circle cx="140" cy="140" r="0" class="node fill-slate-900 stroke-purple-400 stroke-[2px]" />
+                        <text x="140" y="145" text-anchor="middle" class="fill-white text-xs font-mono">SOCIAL</text>
+                    </g>
+                </g>
+
+                <!-- 3. BIOLOGY -->
+                <g id="viz-biology" class="viz-group">
+                    <!-- DNA Path -->
+                    <path d="M 400 100 C 550 250 250 450 400 650" class="stroke-rose-500 stroke-[3px] fill-transparent" />
+                    <path d="M 400 100 C 250 250 550 450 400 650" class="stroke-rose-900 stroke-[3px] fill-transparent opacity-50" />
+                    
+                    <g transform="translate(0, 50)">
+                        <line x1="330" y1="150" x2="470" y2="150" class="stroke-rose-700 stroke-[2px]" />
+                        <circle cx="330" cy="150" r="5" class="fill-rose-400" /> <circle cx="470" cy="150" r="5" class="fill-white" />
+                        
+                        <line x1="380" y1="250" x2="420" y2="250" class="stroke-rose-700 stroke-[2px]" />
+                        <circle cx="380" cy="250" r="5" class="fill-rose-400" /> <circle cx="420" cy="250" r="5" class="fill-white" />
+                        
+                        <line x1="320" y1="350" x2="480" y2="350" class="stroke-rose-700 stroke-[2px]" />
+                        <circle cx="320" cy="350" r="5" class="fill-rose-400" /> <circle cx="480" cy="350" r="5" class="fill-white" />
+
+                        <line x1="370" y1="450" x2="430" y2="450" class="stroke-rose-700 stroke-[2px]" />
+                        <circle cx="370" cy="450" r="5" class="fill-rose-400" /> <circle cx="430" cy="450" r="5" class="fill-white" />
+                    </g>
+                    <text x="400" y="720" text-anchor="middle" class="fill-rose-300 text-sm font-mono tracking-[0.3em]">GENOMIC PROFILING ACTIVE</text>
+                </g>
+
+                <!-- 4. UHI ARCHITECTURE -->
+                <g id="viz-uhi" class="viz-group">
+                    <!-- Left: Walled Garden -->
+                    <g class="walled-garden">
+                        <rect x="150" y="250" width="180" height="280" rx="8" class="fill-slate-900 stroke-red-500 stroke-[2px] opacity-60" />
+                        <text x="240" y="220" text-anchor="middle" class="fill-red-400 text-sm font-bold tracking-widest font-mono">WALLED GARDEN</text>
+                        <circle cx="200" cy="320" r="12" class="fill-slate-700 stroke-red-400" />
+                        <circle cx="280" cy="320" r="12" class="fill-slate-700 stroke-red-400" />
+                        <line x1="200" y1="332" x2="200" y2="450" class="stroke-red-500 stroke-[2px] stroke-dasharray-[4,4]" />
+                        <line x1="280" y1="332" x2="280" y2="450" class="stroke-red-500 stroke-[2px] stroke-dasharray-[4,4]" />
+                        <rect x="180" y="450" width="120" height="50" rx="4" class="fill-red-950 stroke-red-500" />
+                        <text x="240" y="480" text-anchor="middle" class="fill-red-200 text-xs font-mono">LOCKED SILO</text>
+                    </g>
+
+                    <!-- Right: Open UHI -->
+                    <g class="open-protocol">
+                        <rect x="450" y="250" width="220" height="280" rx="8" class="fill-slate-900 stroke-emerald-500 stroke-[2px]" />
+                        <text x="560" y="220" text-anchor="middle" class="fill-emerald-400 text-sm font-bold tracking-widest font-mono">OPEN PROTOCOL (UHI)</text>
+                        
+                        <circle cx="500" cy="300" r="16" class="fill-emerald-600" /> <text x="500" y="304" text-anchor="middle" class="fill-white text-[10px] font-mono">EUA</text>
+                        <circle cx="620" cy="300" r="16" class="fill-emerald-600" /> <text x="620" y="304" text-anchor="middle" class="fill-white text-[10px] font-mono">EUA</text>
+                        
+                        <!-- Interoperability Mesh -->
+                        <path d="M 500 316 Q 560 390 500 464 M 620 316 Q 560 390 620 464 M 500 316 Q 560 390 620 464 M 620 316 Q 560 390 500 464" class="stroke-emerald-400 stroke-[2px] opacity-40 fill-transparent" />
+                        
+                        <circle cx="500" cy="480" r="16" class="fill-blue-600" /> <text x="500" y="484" text-anchor="middle" class="fill-white text-[10px] font-mono">HSPA</text>
+                        <circle cx="620" cy="480" r="16" class="fill-blue-600" /> <text x="620" y="484" text-anchor="middle" class="fill-white text-[10px] font-mono">HSPA</text>
+
+                        <rect x="535" y="375" width="50" height="30" rx="15" class="fill-slate-800 stroke-emerald-300 stroke-[2px]" />
+                        <text x="560" y="394" text-anchor="middle" class="fill-emerald-200 text-xs font-bold font-mono">API</text>
+                    </g>
+                </g>
+
+                <!-- 5. BLOCKCHAIN (SSI & DeFi) -->
+                <g id="viz-blockchain" class="viz-group">
+                    <!-- Hexagon Ring -->
+                    <path d="M 400 220 L 555 310 L 555 490 L 400 580 L 245 490 L 245 310 Z" class="stroke-blue-500 stroke-[2px] fill-transparent" stroke-dasharray="10 6" />
+                    
+                    <line x1="400" y1="400" x2="400" y2="220" class="stroke-blue-800 stroke-[2px]" />
+                    <line x1="400" y1="400" x2="555" y2="310" class="stroke-blue-800 stroke-[2px]" />
+                    <line x1="400" y1="400" x2="555" y2="490" class="stroke-blue-800 stroke-[2px]" />
+                    <line x1="400" y1="400" x2="400" y2="580" class="stroke-blue-800 stroke-[2px]" />
+                    <line x1="400" y1="400" x2="245" y2="490" class="stroke-blue-800 stroke-[2px]" />
+                    <line x1="400" y1="400" x2="245" y2="310" class="stroke-blue-800 stroke-[2px]" />
+
+                    <circle cx="400" cy="400" r="60" class="fill-blue-600" />
+                    <text x="400" y="408" text-anchor="middle" class="fill-white font-bold font-serif-display text-2xl">SSI</text>
+                    <text x="400" y="450" text-anchor="middle" class="fill-blue-200 text-xs font-mono tracking-widest uppercase">Decentralized Identity</text>
+
+                    <!-- Data Blocks -->
+                    <rect x="375" y="200" width="50" height="40" rx="4" class="fill-slate-800 stroke-blue-400 stroke-[2px]" />
+                    <rect x="530" y="290" width="50" height="40" rx="4" class="fill-slate-800 stroke-blue-400 stroke-[2px]" />
+                    <rect x="530" y="470" width="50" height="40" rx="4" class="fill-slate-800 stroke-blue-400 stroke-[2px]" />
+                    <rect x="375" y="560" width="50" height="40" rx="4" class="fill-slate-800 stroke-blue-400 stroke-[2px]" />
+                    <rect x="220" y="470" width="50" height="40" rx="4" class="fill-slate-800 stroke-blue-400 stroke-[2px]" />
+                    <rect x="220" y="290" width="50" height="40" rx="4" class="fill-slate-800 stroke-blue-400 stroke-[2px]" />
+                </g>
+
+                <!-- 6. CLIMATE GRID -->
+                <g id="viz-climate" class="viz-group">
+                    <rect x="150" y="150" width="500" height="500" rx="16" class="fill-slate-900 stroke-green-600 stroke-[2px]" />
+                    
+                    <!-- Line Chart Abstraction -->
+                    <path d="M 200 600 Q 300 350 400 450 T 600 200" class="stroke-green-400 stroke-[4px] fill-transparent" />
+                    <path d="M 200 600 Q 300 350 400 450 T 600 200 L 600 600 Z" class="fill-green-900 opacity-20" />
+                    
+                    <!-- UI Panels -->
+                    <rect x="200" y="200" width="160" height="80" rx="6" class="fill-slate-800 border border-green-500 opacity-90" />
+                    <text x="215" y="230" class="fill-slate-400 text-xs font-mono uppercase">Scope 3 Emissions</text>
+                    <text x="215" y="260" class="fill-green-400 text-3xl font-bold font-mono">-42%</text>
+
+                    <rect x="380" y="200" width="220" height="80" rx="6" class="fill-slate-800 border border-green-500 opacity-90" />
+                    <text x="395" y="230" class="fill-slate-400 text-xs font-mono uppercase">Food Traceability Index</text>
+                    <text x="395" y="260" class="fill-green-400 text-2xl font-bold font-mono">$1.77 Billion</text>
+
+                    <circle cx="600" cy="200" r="8" class="fill-green-300" />
+                    <circle cx="600" cy="200" r="16" class="stroke-green-300 stroke-[1px] fill-transparent" />
+                </g>
+
+                <!-- 7. CITYSCAPE -->
+                <g id="viz-cityscape" class="viz-group">
+                    <!-- Isometric Grid Base -->
+                    <path d="M 400 550 L 700 400 L 400 250 L 100 400 Z" class="fill-slate-800 stroke-orange-500 stroke-[1px]" />
+                    <path d="M 400 550 L 400 600 L 700 450 L 700 400 Z" class="fill-slate-900" />
+                    <path d="M 400 550 L 400 600 L 100 450 L 100 400 Z" class="fill-slate-700" />
+                    
+                    <!-- Buildings -->
+                    <g transform="translate(350, 400)"><rect x="0" y="-180" width="40" height="180" class="fill-slate-600 stroke-orange-400 stroke-[1px]"/><polygon points="0,-180 20,-195 40,-180" class="fill-slate-500"/></g>
+                    <g transform="translate(450, 350)"><rect x="0" y="-220" width="45" height="220" class="fill-slate-600 stroke-orange-400 stroke-[1px]"/><polygon points="0,-220 22.5,-240 45,-220" class="fill-slate-500"/></g>
+                    <g transform="translate(250, 320)"><rect x="0" y="-120" width="35" height="120" class="fill-slate-600 stroke-orange-400 stroke-[1px]"/><polygon points="0,-120 17.5,-135 35,-120" class="fill-slate-500"/></g>
+
+                    <!-- AR Overlay -->
+                    <path d="M 200 550 C 350 400 450 650 600 350" class="stroke-orange-400 stroke-[4px] fill-transparent" stroke-dasharray="8 8" />
+                    <circle cx="600" cy="350" r="8" class="fill-orange-400" />
+                    
+                    <rect x="540" y="290" width="130" height="34" rx="4" class="fill-orange-950 stroke-orange-400 stroke-[1px]" />
+                    <text x="605" y="312" text-anchor="middle" class="fill-orange-200 text-xs font-mono">AR: OPTIMAL ROUTE</text>
+
+                    <text x="400" y="660" text-anchor="middle" class="fill-orange-300 text-xl font-bold font-serif-display tracking-widest">BHARAT FUTURE CITY</text>
+                </g>
+
+                <!-- 8. BAR RACE -->
+                <g id="viz-bar-race" class="viz-group">
+                    <text x="100" y="180" class="fill-white text-3xl font-black font-serif-display">SOVEREIGN CAPEX</text>
+                    <line x1="300" y1="220" x2="300" y2="520" class="stroke-slate-700 stroke-[2px]" />
+                    
+                    <!-- Reliance -->
+                    <text x="100" y="270" class="fill-slate-300 text-lg font-serif">Reliance Industries</text>
+                    <rect x="300" y="250" height="30" rx="4" class="fill-blue-600 bar bar-reliance" />
+                    <text x="315" y="271" class="fill-white text-sm font-mono font-bold" style="mix-blend-mode: difference;">$110 BILLION</text>
+
+                    <!-- Adani -->
+                    <text x="100" y="360" class="fill-slate-300 text-lg font-serif">Adani Group</text>
+                    <rect x="300" y="340" height="30" rx="4" class="fill-emerald-600 bar bar-adani" />
+                    <text x="315" y="361" class="fill-white text-sm font-mono font-bold" style="mix-blend-mode: difference;">$100 BILLION</text>
+
+                    <!-- SaaS -->
+                    <text x="100" y="450" class="fill-slate-300 text-lg font-serif">Swadeshi SaaS</text>
+                    <rect x="300" y="430" height="30" rx="4" class="fill-yellow-500 bar bar-swadeshi" />
+                    <text x="315" y="451" class="fill-white text-sm font-mono font-bold" style="mix-blend-mode: difference;">STRATEGIC</text>
+                    
+                    <text x="400" y="580" text-anchor="middle" class="fill-slate-400 text-sm italic font-serif">The race to build domestic infrastructure and walled-garden Super Apps.</text>
+                </g>
+
+                <!-- 9. MANDALA (Bhashini) -->
+                <g id="viz-mandala" class="viz-group">
+                    <!-- Central Hub -->
+                    <circle cx="400" cy="400" r="50" class="fill-indigo-900 stroke-indigo-400 stroke-[2px] z-10 relative" />
+                    <text x="400" y="405" text-anchor="middle" class="fill-white font-bold font-serif-display tracking-wider">BHASHINI</text>
+                    
+                    <!-- Rays will be injected via JS -->
+                    <g id="mandala-rays"></g>
+
+                    <circle cx="400" cy="400" r="0" class="outer-ring stroke-indigo-800 stroke-[1px] fill-transparent" />
+                    <text x="400" y="700" text-anchor="middle" class="fill-indigo-300 text-lg font-mono tracking-widest uppercase">22 Real-Time Languages</text>
+                </g>
+
+            </svg>
+            
+            <!-- Mobile Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 to-transparent md:hidden pointer-events-none"></div>
+        </section>
+
+        <!-- RIGHT: Scrolling Narrative Text -->
+        <section id="text-container" class="w-full md:w-[45%] relative z-20">
+            <div id="narrative-content" class="max-w-xl mx-auto px-6 py-[20vh] md:py-[35vh]">
+                <!-- Step cards injected via JS -->
+            </div>
+            
+            <div class="h-[20vh] border-t border-slate-200 flex items-center justify-center bg-white mt-[30vh]">
+                <p class="text-slate-400 font-mono text-xs uppercase tracking-widest">End of Report</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Data and Interactive Logic -->
+    <script>
+        // Icons from Feather
+        const ICONS = {
+            globe: '<i data-feather="globe" class="w-6 h-6 mb-5 text-cyan-500"></i>',
+            cpu: '<i data-feather="cpu" class="w-6 h-6 mb-5 text-purple-500"></i>',
+            activity: '<i data-feather="activity" class="w-6 h-6 mb-5 text-rose-500"></i>',
+            server: '<i data-feather="server" class="w-6 h-6 mb-5 text-emerald-500"></i>',
+            shield: '<i data-feather="shield" class="w-6 h-6 mb-5 text-blue-500"></i>',
+            sun: '<i data-feather="sun" class="w-6 h-6 mb-5 text-green-500"></i>',
+            map: '<i data-feather="map" class="w-6 h-6 mb-5 text-orange-500"></i>',
+            layers: '<i data-feather="layers" class="w-6 h-6 mb-5 text-yellow-500"></i>',
+            message: '<i data-feather="message-circle" class="w-6 h-6 mb-5 text-indigo-500"></i>',
+            target: '<i data-feather="target" class="w-6 h-6 mb-5 text-slate-500"></i>'
+        };
+
+        const STORY_STEPS = [
+            {
+                id: 'intro', vizId: 'viz-macro', icon: ICONS.globe,
+                title: 'The Digital Metamorphosis',
+                content: `By 2030, the traditional "mobile application" is dead. In its place: proactive, autonomous agents that mediate reality. Apps will no longer merely facilitate consumption—they will be strictly essential for biological health, financial survival, and climate adaptation.<br><br>In India, the app economy is projected to reach a staggering <span class="font-bold font-sans px-1 bg-cyan-100 text-slate-900 rounded"> $800 billion </span>, representing nearly 12% of the nation's GDP. Driven by a massive middle class and over 1 billion internet users, the direct mobile app market revenue alone will hit $27.67 billion.`
+            },
+            {
+                id: 'ai-agents', vizId: 'viz-network', icon: ICONS.cpu,
+                title: 'The AI Chief of Staff',
+                content: `Manual screen navigation is archaic. The most indispensable application will be your "Personal AI Chief of Staff." It triages communications, negotiates meetings, and executes transactions autonomously using ultra-fast 5G.<br><br>This cognitive offloading could deliver <span class="font-bold font-sans px-1 bg-purple-100 text-slate-900 rounded"> $13 trillion </span> in global economic activity. Simultaneously, the AI Companion Market will surge to $140.75 billion, acting as personalized therapists to bridge a projected global shortage of 11 million health workers.`
+            },
+            {
+                id: 'biohacking', vizId: 'viz-biology', icon: ICONS.activity,
+                title: 'Biological Sovereignty',
+                content: `Applications will transcend diagnostics to become physically augmentative. The Global Digital Health market is soaring to $565.23 billion.<br><br>Biohacking and cognitive enhancement—tracking multimodal biometrics, genomic profiling, and neuromodulation—will reach <span class="font-bold font-sans px-1 bg-rose-100 text-slate-900 rounded"> $69.09 billion </span>. Extreme transhumanist projections foresee CRISPR integration, making cellular repair applications a baseline requirement for physical competitiveness.`
+            },
+            {
+                id: 'uhi', vizId: 'viz-uhi', icon: ICONS.server,
+                title: 'The Unified Health Interface',
+                content: `While global elites chase transhumanism, billions need basic interoperability. India's Ayushman Bharat Digital Mission (ABDM) and the Unified Health Interface (UHI) are revolutionizing access.<br><br>Unlike Western "walled gardens" built on vendor lock-in, UHI operates on <span class="font-bold font-sans px-1 bg-emerald-100 text-slate-900 rounded"> decentralized open protocols </span>. Any patient app can communicate with any doctor app, democratizing telemedicine and granting citizens granular cryptographic control over medical records.`
+            },
+            {
+                id: 'ssi', vizId: 'viz-blockchain', icon: ICONS.shield,
+                title: 'Self-Sovereign Identity & DeFi',
+                content: `Centralized identity is failing. By 2030, an SSI (Self-Sovereign Identity) wallet will be strictly essential for 6.2 billion users to access banking, vote, or sign contracts. The SSI market is exploding to $44.98 billion.<br><br>Coupled with SSI is Decentralized Finance (DeFi), projected to hit <span class="font-bold font-sans px-1 bg-blue-100 text-slate-900 rounded"> $415.12 Billion </span>. Through programmable smart contracts, citizens will control assets natively, enabling instant cross-border remittances without legacy fees.`
+            },
+            {
+                id: 'climate', vizId: 'viz-climate', icon: ICONS.sun,
+                title: 'Climate Resilience Apps',
+                content: `With global disasters escalating, climate apps are literal survival tools. Users will rely on APIs to track Scope 3 emissions and integrate with a $537 billion smart home network.<br><br>In India, the Food Traceability Market will reach <span class="font-bold font-sans px-1 bg-green-100 text-slate-900 rounded"> $1.77 billion </span>. Blockchain and AI will cryptographically verify ethical sourcing, while farmers utilize predictive AI for pest control, bypassing exploitative intermediaries.`
+            },
+            {
+                id: 'cities', vizId: 'viz-cityscape', icon: ICONS.map,
+                title: 'Hyper-Local Urban Governance',
+                content: `By 2030, the smart city is navigated via Augmented Reality (AR). Take Hyderabad's 30,000-acre Bharat Future City as a template.<br><br>Apps act as conduits for democratic participation. Spatial navigation will fuse real-time data science with <span class="font-bold font-sans px-1 bg-orange-100 text-slate-900 rounded"> AR overlays </span>, prioritizing multimodal transit algorithms over traditional 2D car-centric maps to optimize human flow and reduce emissions.`
+            },
+            {
+                id: 'super-apps', vizId: 'viz-bar-race', icon: ICONS.layers,
+                title: 'The Sovereign Super App Wars',
+                content: `The digital lifestyle is consolidating into massive "Super Apps" driven by domestic conglomerates.<br><br>Reliance Industries is deploying <span class="font-bold font-sans px-1 bg-blue-100 text-slate-900 rounded"> $110 billion </span> into full-stack AI and telecom. The Adani Group is committing $100 billion for green data centers. Meanwhile, a "Swadeshi" movement—led by companies like Zoho—is building sovereign alternatives to Western monopolies to protect against surveillance capitalism.`
+            },
+            {
+                id: 'bhashini', vizId: 'viz-mandala', icon: ICONS.message,
+                title: 'Bhashini: The Linguistic Bridge',
+                content: `A monolithic, English-first ecosystem disenfranchises millions. The solution is Digital Public Infrastructure (DPI) like India's Bhashini.<br><br>Offering real-time AI translation across <span class="font-bold font-sans px-1 bg-indigo-100 text-slate-900 rounded"> 22 recognized languages </span>, Bhashini breaks the literacy divide. Voice-first AI chatbots ensure that non-literate populations can fluidly interact with complex DeFi and civic governance platforms.`
+            },
+            {
+                id: 'conclusion', vizId: 'viz-macro', icon: ICONS.target,
+                title: 'Engineering the Ecosystem',
+                content: `To build this future, India's tech sector is executing a massive pivot to achieve <span class="font-bold font-sans px-1 bg-cyan-100 text-slate-900 rounded"> $750–$850 billion </span> in annual revenue by 2035.<br><br>Moving from manual labor arbitrage to scalable, AI-native SaaS platforms, the definitive challenge of the coming decade is ensuring this pervasive, autonomous digital nervous system remains secure, democratized, and intrinsically human-centric.`
+            }
+        ];
+
+        // 1. Generate Narrative HTML
+        const container = document.getElementById('narrative-content');
+        STORY_STEPS.forEach((step, index) => {
+            const article = document.createElement('article');
+            article.className = 'step-card mb-[60vh] relative';
+            article.dataset.stepIndex = index;
+            article.dataset.vizId = step.vizId;
+            
+            // Format step number (01, 02, etc.)
+            const stepNum = (index + 1).toString().padStart(2, '0');
+
+            article.innerHTML = `
+                <div class="bg-white/95 backdrop-blur-sm p-8 md:p-10 border-t-4 border-slate-900 shadow-2xl rounded-sm relative z-10">
+                    <div class="absolute -top-10 -left-6 text-8xl font-black font-sans text-slate-100 select-none z-0 tracking-tighter mix-blend-multiply">${stepNum}</div>
+                    <div class="relative z-10">
+                        ${step.icon}
+                        <h2 class="text-3xl font-black font-serif-display mb-6 leading-tight text-slate-900">
+                            ${step.title}
+                        </h2>
+                        <p class="text-lg text-slate-700 leading-relaxed font-serif">
+                            ${step.content}
+                        </p>
+                    </div>
+                </div>
+            `;
+            container.appendChild(article);
+        });
+
+        // Initialize Feather Icons
+        feather.replace();
+
+        // 2. Generate Mandala Rays (JS Injection for SVG loops)
+        const mandalaGroup = document.getElementById('mandala-rays');
+        for (let i = 0; i < 22; i++) {
+            const angle = (i * (360 / 22) * Math.PI) / 180;
+            const x1 = 400 + Math.cos(angle) * 60;
+            const y1 = 400 + Math.sin(angle) * 60;
+            const x2 = 400 + Math.cos(angle) * 240;
+            const y2 = 400 + Math.sin(angle) * 240;
+            
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+            line.setAttribute("class", "stroke-indigo-500 stroke-[1.5px] opacity-0");
+            line.style.transition = `all 1s cubic-bezier(0.4, 0, 0.2, 1) ${i * 0.05}s`;
+            
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", x2); circle.setAttribute("cy", y2);
+            circle.setAttribute("r", "4");
+            circle.setAttribute("class", "fill-cyan-400 opacity-0");
+            circle.style.transition = `opacity 0.5s ${1 + (i*0.05)}s`;
+
+            mandalaGroup.appendChild(line);
+            mandalaGroup.appendChild(circle);
+        }
+        
+        // CSS rule injected via JS for mandala rays animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #viz-mandala.active-state #mandala-rays line { stroke-dasharray: 200; stroke-dashoffset: 0; opacity: 1; }
+            #viz-mandala #mandala-rays line { stroke-dasharray: 200; stroke-dashoffset: 200; opacity: 0; }
+            #viz-mandala.active-state #mandala-rays circle { opacity: 1; }
+        `;
+        document.head.appendChild(style);
+
+
+        // 3. Scrollytelling Intersection Observer
+        const stepCards = document.querySelectorAll('.step-card');
+        const vizGroups = document.querySelectorAll('.viz-group');
+
+        const updateVisuals = (vizId) => {
+            // Hide all graphics
+            vizGroups.forEach(g => g.classList.remove('active-state'));
+            
+            // Show specific graphic
+            const activeViz = document.getElementById(vizId);
+            if (activeViz) activeViz.classList.add('active-state');
+        };
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-40% 0px -40% 0px', // Triggers when the card is in the middle 20% of the screen
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Update Text Active State
+                    stepCards.forEach(card => card.classList.remove('is-active'));
+                    entry.target.classList.add('is-active');
+                    
+                    // Update Visual Active State
+                    const targetVizId = entry.target.dataset.vizId;
+                    updateVisuals(targetVizId);
+                }
+            });
+        }, observerOptions);
+
+        stepCards.forEach(card => observer.observe(card));
+
+        // Initial setup: activate first viz
+        updateVisuals('viz-macro');
+        stepCards[0].classList.add('is-active');
+
+    </script>
+</body>
+</html>

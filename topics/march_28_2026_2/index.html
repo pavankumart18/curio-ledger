@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Semiotics of Salutation: India's Gestural Vernacular</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: McKinsey-inspired Executive Palette (Deep Navy, Slate, Crisp White, Bronze Accents) -->
+    <!-- Application Structure Plan: The SPA is structured as a "Scrollytelling" Executive Briefing. It features a sticky sidebar navigation on desktop for constant spatial awareness, with content divided into thematic chapters. Information is revealed via scroll-triggered fade-ins (IntersectionObserver) to reduce cognitive load. Complex comparisons (like the Armed Forces) use interactive tabbed modules and Chart.js to keep the user engaged without long scrolling blocks. The flow mimics a high-level consultancy report: Introduction -> Deep Dives by Sector -> Cultural Synthesis -> Corporate Conclusion. -->
+    <!-- Visualization & Content Choices: 
+         1. Tri-Service Angles -> Goal: Compare physical mechanics -> Viz: Horizontal Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Quantifies the physical differences (0, 45, 90 degrees) cleanly -> Method: Chart.js Canvas. 
+         2. Evolution of "Jai Hind" -> Goal: Show historical progression -> Viz: Interactive Vertical Timeline -> Interaction: Scroll-triggered highlights -> Justification: Best for chronological narrative -> Method: HTML/Tailwind CSS.
+         3. Youth & Paramil Comparisons -> Goal: Organize parallel rules -> Viz: Interactive Cards & Accordions -> Interaction: Click/Hover to reveal -> Justification: Groups dense regulatory data (like BSF Guard rules or Scout fingers) into digestible chunks -> Method: HTML/Vanilla JS.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <style>
+        /* Typography & Theming */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* light slate/white */
+            color: #334155;
+        }
+        h1, h2, h3, h4, .serif-heading {
+            font-family: 'Playfair Display', serif;
+            color: #0f172a;
+        }
+        .accent-color { color: #b45309; } /* Bronze/Gold */
+        .bg-accent { background-color: #b45309; }
+
+        /* Scroll Progress Bar */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #b45309;
+            width: 0%;
+            z-index: 50;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Chart Container (Strict Requirements) */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        /* Custom UI Elements */
+        .nav-link {
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        .nav-link.active-nav {
+            border-left-color: #b45309;
+            color: #0f172a;
+            font-weight: 600;
+            background-color: #f1f5f9;
+        }
+        
+        .tab-btn {
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active-tab {
+            border-bottom-color: #0f172a;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+            transition: background-color 0.4s ease;
+        }
+        .timeline-item.active-timeline::before {
+            background-color: #b45309;
+            box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-orange-200 selection:text-orange-900">
+
+    <div id="progress-bar"></div>
+
+    <!-- Hero Section -->
+    <header class="min-h-screen flex items-center justify-center bg-[#0f172a] text-white relative px-6 py-20">
+        <div class="max-w-4xl mx-auto text-center reveal active">
+            <div class="text-orange-400 font-semibold tracking-widest uppercase text-sm mb-6">Executive Insight Report</div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-8 leading-tight">The Semiotics of <br><span class="italic text-orange-300">Salutation</span></h1>
+            <p class="text-xl md:text-2xl text-slate-300 font-light mb-12 max-w-3xl mx-auto leading-relaxed">
+                A Comprehensive Analysis of Greeting Protocols and Military Salutes Across Indian Sectors.
+            </p>
+            <a href="#introduction" class="inline-flex items-center justify-center px-8 py-3 border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-[#0f172a] transition-colors rounded-full text-sm uppercase tracking-wide font-medium">
+                Begin Exploration ↓
+            </a>
+        </div>
+        <div class="absolute bottom-10 left-0 right-0 text-center opacity-50 text-sm font-light">
+            Scroll to discover the gestural vernacular of the Indian State
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row relative">
+        
+        <!-- Sticky Sidebar Navigation -->
+        <aside class="w-full md:w-1/4 hidden md:block shrink-0 relative">
+            <div class="sticky top-12 pr-8">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6">Contents</h3>
+                <nav id="toc" class="flex flex-col space-y-2 text-sm text-slate-500">
+                    <a href="#introduction" class="nav-link py-2 pl-4 hover:text-slate-900 block">1. State & Transition</a>
+                    <a href="#armed-forces" class="nav-link py-2 pl-4 hover:text-slate-900 block">2. Armed Forces</a>
+                    <a href="#civvies-drill" class="nav-link py-2 pl-4 hover:text-slate-900 block">3. Civvies & Protocol</a>
+                    <a href="#paramilitary-police" class="nav-link py-2 pl-4 hover:text-slate-900 block">4. Paramilitary & Police</a>
+                    <a href="#youth" class="nav-link py-2 pl-4 hover:text-slate-900 block">5. Youth Auxiliaries</a>
+                    <a href="#diplomatic" class="nav-link py-2 pl-4 hover:text-slate-900 block">6. Civil & Diplomatic</a>
+                    <a href="#lexicon" class="nav-link py-2 pl-4 hover:text-slate-900 block">7. The Spoken Salute</a>
+                    <a href="#cultural-corporate" class="nav-link py-2 pl-4 hover:text-slate-900 block">8. Culture & Corporate</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="w-full md:w-3/4 md:pl-8 lg:pl-16">
+
+            <!-- 1. Introduction -->
+            <section id="introduction" class="mb-32 pt-12">
+                <div class="reveal">
+                    <h2 class="text-4xl font-bold mb-6">1. The Gestural Vernacular of the Indian State</h2>
+                    <p class="text-lg leading-relaxed mb-6">
+                        The act of saluting is fundamentally a semiotic exercise—a physical manifestation of institutional memory, hierarchical respect, and sociological traditions. In India, it operates as an embodied taxonomy categorizing individuals across the military, civil administration, and corporate sectors.
+                    </p>
+                    <div class="bg-white p-8 border-l-4 border-[#0f172a] shadow-sm my-8">
+                        <h4 class="font-bold text-xl mb-3 serif-heading">The 1950 Transition</h4>
+                        <p class="text-slate-600">
+                            When India transitioned to a republic on January 26, 1950, it retained the structural discipline of the British era but deeply indigenized its core values. The colonial 21-gun standard was replaced by a <strong class="text-[#0f172a]">31-gun salute</strong> as Dr. Rajendra Prasad unfurled the National Flag.
+                        </p>
+                        <div class="mt-4 flex flex-wrap gap-4 text-sm font-medium">
+                            <span class="bg-slate-100 px-3 py-1 rounded text-slate-700">Naam, Namak, Nishan (Name, Honour, Insignia)</span>
+                            <span class="bg-slate-100 px-3 py-1 rounded text-slate-700">Veer Bhogya Vasundhara</span>
+                            <span class="bg-slate-100 px-3 py-1 rounded text-slate-700">Sarvatra Izzat o Iqbal</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Armed Forces -->
+            <section id="armed-forces" class="mb-32 pt-12">
+                <div class="reveal">
+                    <h2 class="text-4xl font-bold mb-4">2. The Armed Forces: Tri-Service Nuances</h2>
+                    <p class="text-lg leading-relaxed mb-10">
+                        The physical execution of the salute varies profoundly among the Army, Navy, and Air Force. This variation is deeply rooted in the distinct historical environments and operational realities of each branch.
+                    </p>
+
+                    <!-- Interactive Tri-Service Module -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-slate-200 mb-12">
+                        <div class="flex border-b border-slate-200">
+                            <button class="tab-btn active-tab flex-1 py-4 text-center text-slate-500 hover:text-slate-900 focus:outline-none" onclick="openMilitaryTab('army', this)">Indian Army</button>
+                            <button class="tab-btn flex-1 py-4 text-center text-slate-500 hover:text-slate-900 focus:outline-none" onclick="openMilitaryTab('navy', this)">Indian Navy</button>
+                            <button class="tab-btn flex-1 py-4 text-center text-slate-500 hover:text-slate-900 focus:outline-none" onclick="openMilitaryTab('iaf', this)">Indian Air Force</button>
+                        </div>
+                        
+                        <div class="p-8 min-h-[300px] flex flex-col justify-center">
+                            <!-- Army Content -->
+                            <div id="tab-army" class="military-content block fade-in">
+                                <div class="flex items-center mb-4">
+                                    <span class="text-4xl mr-4">⚔️</span>
+                                    <h3 class="text-2xl font-bold serif-heading">The Open Palm of Trust</h3>
+                                </div>
+                                <div class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 uppercase tracking-widest font-bold mb-4 rounded">90° Angle - Open Forward</div>
+                                <p class="text-slate-600 mb-4">The fingers and thumb are straight, with the middle finger extended to almost touch the hatband or right eyebrow. The wrist and forearm form a rigid, unbroken line.</p>
+                                <p class="text-slate-600"><strong>History:</strong> Traces back to medieval European knights raising visors to show peaceful intent. In the Army, it proves the saluting personnel is unarmed, establishing immediate trust and chain of command. Often accompanied by regimental cries like the Sikh Regiment's "Sat Sri Akal".</p>
+                            </div>
+                            
+                            <!-- Navy Content -->
+                            <div id="tab-navy" class="military-content hidden fade-in">
+                                <div class="flex items-center mb-4">
+                                    <span class="text-4xl mr-4">⚓</span>
+                                    <h3 class="text-2xl font-bold serif-heading">The Concealed Palm</h3>
+                                </div>
+                                <div class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 uppercase tracking-widest font-bold mb-4 rounded">0° Angle - Facing Downward</div>
+                                <p class="text-slate-600 mb-4">The palm faces downwards, angled at a strict 90 degrees to the ground and forehead, effectively hiding the palm from the view of the senior officer.</p>
+                                <p class="text-slate-600"><strong>History:</strong> An artifact of maritime history and British Commonwealth tradition. During the era of sailing ships, sailors' hands were coated in tar, grease, and coal dust. Hiding the filthy palm was a profound mark of respect to superiors.</p>
+                            </div>
+
+                            <!-- IAF Content -->
+                            <div id="tab-iaf" class="military-content hidden fade-in">
+                                <div class="flex items-center mb-4">
+                                    <span class="text-4xl mr-4">✈️</span>
+                                    <h3 class="text-2xl font-bold serif-heading">The 45-Degree Trajectory</h3>
+                                </div>
+                                <div class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 uppercase tracking-widest font-bold mb-4 rounded">45° Angle - Diagonally Upward</div>
+                                <p class="text-slate-600 mb-4">The right arm is raised smartly by the shortest route, resting the palm at a highly specific 45-degree angle to the ground.</p>
+                                <p class="text-slate-600"><strong>History:</strong> Officially adopted on March 15, 2006 (prior to this, they used the Army salute). It visually resembles an aircraft taking off. It aligns perfectly with the IAF motto: <em>"Touch the Sky with Glory" (Nabhaḥ Spr̥śaṁ Dīptam)</em>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Visualization -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm reveal">
+                        <h4 class="text-center font-bold mb-2">Biomechanical Geometry Comparison</h4>
+                        <p class="text-center text-sm text-slate-500 mb-6">Angle of the palm relative to the ground.</p>
+                        <div class="chart-container">
+                            <canvas id="militaryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Civvies & Protocol -->
+            <section id="civvies-drill" class="mb-32 pt-12">
+                <div class="reveal">
+                    <h2 class="text-4xl font-bold mb-6">3. Advanced Drill & Civilian Attire</h2>
+                    <p class="text-lg leading-relaxed mb-8">
+                        The physical drill is entirely contextualized by the uniform and the equipment carried.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-lg mb-2">Armed Ceremonials</h4>
+                            <p class="text-sm text-slate-600 mb-3">When armed, personnel utilize weapon-specific respect:</p>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li><strong>Butt/Rifle Salute:</strong> Snapping the weapon to "Present Arms" (<em>Salami Shastra</em>).</li>
+                                <li><strong>Sword Salute:</strong> Complex presentation, sweeping drop by commissioned officers.</li>
+                                <li><strong>Vehicle Salute:</strong> Sharp turn of head and eyes while mobile.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-[#0f172a] text-white p-6 rounded-lg shadow-lg">
+                            <h4 class="font-bold text-lg mb-2 text-orange-400">Civilian Attire (Civvies) Protocol</h4>
+                            <p class="text-sm text-slate-300 mb-3">Without a uniform, a mechanical hand salute is improper.</p>
+                            <ul class="list-disc pl-5 text-sm text-slate-300 space-y-1">
+                                <li>Stand at rigid attention (heels together, arms straight).</li>
+                                <li>Verbal greeting: "Jai Hind, Sir/Ma'am".</li>
+                                <li>During Anthems: Remove headgear, stand rigidly.</li>
+                                <li><em>Note: 2006 IAF rules initially allowed seated salutes, but standing at attention remains the tri-service default.</em></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Paramilitary & Police -->
+            <section id="paramilitary-police" class="mb-32 pt-12">
+                <div class="reveal">
+                    <h2 class="text-4xl font-bold mb-6">4. Paramilitary & Police Dynamics</h2>
+                    
+                    <div class="space-y-8">
+                        <!-- Paramilitary (BSF/CAPF) -->
+                        <div>
+                            <h3 class="text-2xl font-semibold mb-3 serif-heading">Central Armed Police Forces (CAPF)</h3>
+                            <p class="text-slate-600 mb-4">Organizations like CRPF, BSF, ITBP, and CISF closely mirror the Indian Army's open-palm forward salute. However, their ceremonial protocols are exhaustively detailed in documents like the BSF Rules of 1989.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="border border-slate-200 p-4 rounded bg-white">
+                                    <div class="font-bold text-sm mb-1 text-slate-800">National Salute</div>
+                                    <div class="text-xs text-slate-500">Reserved for the President/Governors. 52-sec National Anthem.</div>
+                                </div>
+                                <div class="border border-slate-200 p-4 rounded bg-white">
+                                    <div class="font-bold text-sm mb-1 text-slate-800">Guard of Honour</div>
+                                    <div class="text-xs text-slate-500">Reporting in Hindi (English at remote BOPs). Orderly officers do not salute.</div>
+                                </div>
+                                <div class="border border-slate-200 p-4 rounded bg-white">
+                                    <div class="font-bold text-sm mb-1 text-slate-800">Teen Jai (Three Cheers)</div>
+                                    <div class="text-xs text-slate-500">Vocal salute for highest dignitaries. Unauthorized cries strictly prohibited.</div>
+                                </div>
+                                <div class="border border-slate-200 p-4 rounded bg-white">
+                                    <div class="font-bold text-sm mb-1 text-slate-800">Shok Shastra</div>
+                                    <div class="text-xs text-slate-500">Mourning arms for martyrs during "Last Post" and "Rouse".</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- State Police -->
+                        <div class="bg-slate-100 p-8 rounded-xl relative overflow-hidden">
+                            <div class="absolute right-0 top-0 opacity-10 text-9xl">👮</div>
+                            <h3 class="text-2xl font-semibold mb-3 serif-heading relative z-10">State Police Forces</h3>
+                            <p class="text-slate-600 mb-4 relative z-10">Governed by the BPR&D Drill Manual. Police are trained for civil commotion and riot control, not warfare.</p>
+                            <ul class="list-disc pl-5 text-slate-700 space-y-2 relative z-10">
+                                <li><strong>The Lathi Salute:</strong> Holding the 6-to-8-foot staff vertically, transitioning to an inspection stance to show respect while maintaining control.</li>
+                                <li><strong>Pragmatic Exceptions:</strong> If the right arm is injured, BPR&D permits a <em>left-hand</em> salute. Mounted police salute with the right while managing reins with the left.</li>
+                                <li><strong>Political Friction:</strong> Saluting is a visible metric of deference. Tensions frequently arise requiring state DGs to mandate salutes for elected MPs/MLAs, highlighting the friction between uniformed hierarchy and democratic representation (e.g., WB vs Delhi Police standoffs).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Youth Auxiliaries -->
+            <section id="youth" class="mb-32 pt-12">
+                <div class="reveal">
+                    <h2 class="text-4xl font-bold mb-6">5. Youth Auxiliaries: Pedagogical Salutations</h2>
+                    <p class="text-lg leading-relaxed mb-8">
+                        For millions of youth, salutes act as pedagogical tools to instill discipline, coordination, and ethics.
+                    </p>
+
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <!-- NCC -->
+                        <div class="flex-1 bg-white p-6 border border-slate-200 rounded-lg shadow-sm">
+                            <h3 class="text-xl font-bold mb-2 text-[#0f172a]">National Cadet Corps (NCC)</h3>
+                            <p class="text-sm font-semibold text-orange-600 mb-4">"Ekta Aur Anushasan" (Unity and Discipline)</p>
+                            <p class="text-sm text-slate-600 mb-4">Over 1.7 million cadets perfectly mirror the armed forces wing they shadow (Army, Navy, or Air).</p>
+                            <div class="bg-slate-50 p-3 rounded text-sm text-slate-700">
+                                <strong>Training Methodology:</strong> Uses standardized Hindi commands (e.g., "Dheere chal"). Saluting involves an internal mnemonic count: <em>"salute karna khali khali... 1-2-3-4-5-6"</em>. Concludes ceremonies with a vocal "Jai Hind Shreeman".
+                            </div>
+                        </div>
+
+                        <!-- Scouts -->
+                        <div class="flex-1 bg-white p-6 border border-slate-200 rounded-lg shadow-sm">
+                            <h3 class="text-xl font-bold mb-2 text-[#0f172a]">Bharat Scouts & Guides</h3>
+                            <p class="text-sm font-semibold text-orange-600 mb-4">Decoupled from military aggression</p>
+                            <p class="text-sm text-slate-600 mb-4">Smartly raise right arm to shoulder level, palm front. Index finger touches 1 inch above right eyebrow.</p>
+                            <ul class="text-sm text-slate-700 space-y-2 border-t pt-3">
+                                <li><strong>3 Upright Fingers:</strong> Duty to God/Country, Helping Others, Obeying Scout Law.</li>
+                                <li><strong>Thumb over Pinky:</strong> The strong protecting the weak.</li>
+                                <li><strong>Left-Handed Handshake:</strong> Closest to the heart; signifies vulnerability and trust over business formality.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. Civil & Diplomatic -->
+            <section id="diplomatic" class="mb-32 pt-12">
+                <div class="reveal bg-[#0f172a] text-white p-10 rounded-2xl relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🏛️</div>
+                    <h2 class="text-3xl font-bold mb-4 relative z-10">6. Civil Administration & Diplomacy</h2>
+                    <p class="text-slate-300 leading-relaxed mb-6 relative z-10">
+                        Outside uniformed services, elite administration (IAS, IPS, IFS) relies on bureaucratic seniority.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                        <div>
+                            <h4 class="font-bold text-orange-400 mb-2">Domestic (IAS/IPS)</h4>
+                            <p class="text-sm text-slate-300">No constitutional rule mandates a civilian must salute an officer. However, internally, junior officers salute seniors on duty as an acknowledgment of administrative rank.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-orange-400 mb-2">International (IFS)</h4>
+                            <p class="text-sm text-slate-300">When presenting credentials abroad as an Ambassador/High Commissioner representing the sovereign state, the civilian IFS officer is accorded, inspects, and acknowledges a formal Guard of Honour by the host nation's military.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. The Spoken Salute -->
+            <section id="lexicon" class="mb-32 pt-12">
+                <div class="reveal">
+                    <h2 class="text-4xl font-bold mb-6">7. The Lexicon of Salutation: 'Jai Hind'</h2>
+                    <p class="text-lg leading-relaxed mb-10">
+                        A physical salute in India is rarely executed in silence. "Jai Hind" (Victory to India) has evolved into the definitive verbal salute of the state.
+                    </p>
+                    
+                    <!-- Interactive Timeline -->
+                    <div class="relative pl-6 border-l-2 border-slate-200 space-y-12 pb-8" id="timeline-container">
+                        <div class="timeline-item relative reveal">
+                            <h4 class="font-bold text-xl text-[#0f172a]">1907: Etymological Origins</h4>
+                            <p class="text-sm text-slate-600 mt-2">Coined by revolutionary Chempakaraman Pillai. 'Jai' (Sanskrit: victory/rejoice) + 'Hind' (Persian endonym for India).</p>
+                        </div>
+                        <div class="timeline-item relative reveal">
+                            <h4 class="font-bold text-xl text-[#0f172a]">1940s: The Indian National Army</h4>
+                            <p class="text-sm text-slate-600 mt-2">Zain-ul Abideen Hasan proposed it to Subhas Chandra Bose, who demanded a unifying Indian greeting over Western "Hello". It became a fierce battle cry.</p>
+                            <p class="text-xs text-slate-500 mt-1 italic">Note: Gandhi supported Vande Mataram but said Jai Hind should supplement it.</p>
+                        </div>
+                        <div class="timeline-item relative reveal">
+                            <h4 class="font-bold text-xl text-[#0f172a]">Post-1947: National Adoption</h4>
+                            <p class="text-sm text-slate-600 mt-2">Prime Ministers (Nehru, Indira Gandhi) popularized it. Evolved from an anti-colonial cry to the supreme, sanctioned state slogan.</p>
+                        </div>
+                        <div class="timeline-item relative reveal">
+                            <h4 class="font-bold text-xl text-[#0f172a]">September 2012: Army Mandate</h4>
+                            <p class="text-sm text-slate-600 mt-2">Army Chief Gen. Bikram Singh's "Back to Basics" ordered replacement of "Good Morning/Afternoon" among officers exclusively with a crisp salute and "Jai Hind".</p>
+                        </div>
+                        <div class="timeline-item relative reveal">
+                            <h4 class="font-bold text-xl text-[#0f172a]">August 2024: Civil Society Expansion</h4>
+                            <p class="text-sm text-slate-600 mt-2">Haryana state government mandated all schools replace "Good morning" with "Jai Hind" to foster patriotism and transcend regional divides.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. Culture & Corporate -->
+            <section id="cultural-corporate" class="mb-32 pt-12">
+                <div class="reveal">
+                    <h2 class="text-4xl font-bold mb-6">8. Culture & Corporate Protocols</h2>
+                    <p class="text-lg leading-relaxed mb-8">
+                        In civilian and corporate life, physical touch is often superseded by non-contact gestures, navigating hierarchy and tradition.
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Namaste -->
+                        <div class="bg-white p-6 border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                            <div class="text-4xl mb-4 text-center">🙏</div>
+                            <h3 class="text-xl font-bold mb-2 text-center">Namaste / Vanakkam</h3>
+                            <p class="text-sm text-slate-600 text-center mb-4"><em>Añjali Mudrā</em>. Palms pressed, thumbs close to chest, slight bow.</p>
+                            <div class="bg-slate-50 p-3 rounded text-xs text-slate-700">
+                                <strong>Meaning:</strong> "I bow to you." Signifies acknowledging the divine spark in another. Deeply adheres to gender boundaries by requiring no physical contact.
+                            </div>
+                        </div>
+
+                        <!-- Adaab -->
+                        <div class="bg-white p-6 border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                            <div class="text-4xl mb-4 text-center">✋</div>
+                            <h3 class="text-xl font-bold mb-2 text-center">Adaab</h3>
+                            <p class="text-sm text-slate-600 text-center mb-4">Right hand to face, palm inward, fingertips near forehead, torso bowed.</p>
+                            <div class="bg-slate-50 p-3 rounded text-xs text-slate-700">
+                                <strong>Meaning:</strong> Rooted in <em>Ganga-Jamuni tehzeeb</em> and Nawabi courts. A highly refined, secular greeting bridging religious divides ("Adab arz hai").
+                            </div>
+                        </div>
+
+                        <!-- Corporate -->
+                        <div class="bg-white p-6 border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                            <div class="text-4xl mb-4 text-center">🤝</div>
+                            <h3 class="text-xl font-bold mb-2 text-center">Corporate Etiquette</h3>
+                            <p class="text-sm text-slate-600 text-center mb-4">Western handshake modified by Indian hierarchy.</p>
+                            <div class="bg-slate-50 p-3 rounded text-xs text-slate-700 space-y-1">
+                                <li>Men wait for women to initiate handshakes.</li>
+                                <li>Strict greeting of most senior/eldest first.</li>
+                                <li>Use of "Sir", "Ma'am", or suffix "-jee" (e.g., Rahul-jee).</li>
+                                <li>Legacy orgs (Tata Group) encode cultural respect directly into official Codes of Conduct.</li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conclusion -->
+            <section class="mb-32 pt-12 border-t border-slate-200">
+                <div class="reveal text-center max-w-2xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6 serif-heading">Synthesis</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        Every salute, handshake, and bow in India functions as a microcosm of the state itself: deeply respectful of entrenched hierarchy, anchored by a rich, pluralistic historical tradition, and continuously evolving toward the future.
+                    </p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- 1. Scroll Progress Bar ---
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        };
+
+        // --- 2. Intersection Observer for Scroll Animations & Spy Nav ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const reveals = document.querySelectorAll('.reveal');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            const timelineItems = document.querySelectorAll('.timeline-item');
+
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+            
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        
+                        // Active Nav logic
+                        if(entry.target.tagName === 'SECTION') {
+                            let id = entry.target.getAttribute('id');
+                            navLinks.forEach(link => {
+                                link.classList.remove('active-nav');
+                                if(link.getAttribute('href') === `#${id}`) {
+                                    link.classList.add('active-nav');
+                                }
+                            });
+                        }
+                        
+                        // Timeline active dot logic
+                        if(entry.target.classList.contains('timeline-item')) {
+                            entry.target.classList.add('active-timeline');
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            reveals.forEach(reveal => observer.observe(reveal));
+            sections.forEach(section => observer.observe(section));
+            timelineItems.forEach(item => observer.observe(item));
+
+            // Initialize Military Chart
+            initChart();
+        });
+
+        // --- 3. Interactive Tabs for Armed Forces ---
+        function openMilitaryTab(tabId, btnElement) {
+            // Hide all contents
+            let contents = document.getElementsByClassName("military-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.add("hidden");
+                contents[i].classList.remove("block");
+            }
+            
+            // Remove active style from all buttons
+            let btns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < btns.length; i++) {
+                btns[i].classList.remove("active-tab");
+            }
+            
+            // Show requested content and style button
+            document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+            document.getElementById(`tab-${tabId}`).classList.add("block");
+            btnElement.classList.add("active-tab");
+        }
+
+        // --- 4. Chart.js Visualization ---
+        function initChart() {
+            const ctx = document.getElementById('militaryChart').getContext('2d');
+            
+            // Chart Data directly from report
+            const data = {
+                labels: ['Indian Navy (Concealed)', 'Indian Air Force (Trajectory)', 'Indian Army (Open Palm)'],
+                datasets: [{
+                    label: 'Palm Angle (Degrees)',
+                    data: [0, 45, 90],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)', // Blue
+                        'rgba(168, 85, 247, 0.8)', // Purple
+                        'rgba(34, 197, 94, 0.8)'   // Green
+                    ],
+                    borderColor: [
+                        '#1e3a8a',
+                        '#581c87',
+                        '#14532d'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            };
+
+            const config = {
+                type: 'bar', // Horizontal bar for easier reading of labels
+                data: data,
+                options: {
+                    indexAxis: 'y', // Makes it horizontal
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.parsed.x}° Angle to Ground`;
+                                }
+                            },
+                            backgroundColor: '#0f172a',
+                            titleFont: { family: 'Inter', size: 14 },
+                            bodyFont: { family: 'Inter', size: 13 },
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Degrees (°)', color: '#64748b' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { family: 'Inter', weight: '600' },
+                                color: '#334155'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        }
+    </script>
+</body>
+</html>

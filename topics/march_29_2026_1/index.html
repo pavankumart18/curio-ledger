@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Sovereign Market-Maker: YC 2026</title>
+    
+    <!-- Fonts: Inter for UI/Data, Merriweather for Editorial Body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        yc: '#f26522',
+                        ink: '#111111',
+                        paper: '#fdfbf7',
+                        'paper-dark': '#f3f0e9'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles for specific animations and scrollbars -->
+    <style>
+        body {
+            background-color: #fdfbf7;
+            color: #111111;
+            overflow-x: hidden;
+        }
+        
+        ::selection {
+            background-color: #f26522;
+            color: white;
+        }
+
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #f26522;
+            width: 0%;
+            z-index: 9999;
+            transform-origin: 0 50%;
+        }
+
+        .gsap-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Editorial Drop Cap */
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 5rem;
+            line-height: 4rem;
+            padding-top: 0.25rem;
+            padding-right: 0.5rem;
+            font-weight: 900;
+            color: #f26522;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Calculator Bar Transitions */
+        .calc-bar {
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-yc selection:text-white">
+
+    <!-- Reading Progress -->
+    <div id="progress-bar"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-paper/90 backdrop-blur-md z-50 border-b border-gray-200 transition-transform duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="font-sans font-black text-xl tracking-tighter">YC<span class="text-yc">2026</span></div>
+            <div class="hidden md:flex space-x-6 font-sans text-sm font-semibold text-gray-500">
+                <a href="#scale" class="hover:text-ink transition-colors">Scale</a>
+                <a href="#deal" class="hover:text-ink transition-colors">The Deal</a>
+                <a href="#crucible" class="hover:text-ink transition-colors">Selection</a>
+                <a href="#data" class="hover:text-ink transition-colors">Data</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden bg-ink text-paper">
+        <!-- Abstract Background -->
+        <div class="absolute inset-0 z-0 opacity-30">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-yc rounded-full mix-blend-multiply filter blur-[128px] animate-blob"></div>
+            <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] animate-blob animation-delay-2000"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto text-center mt-16">
+            <div class="gsap-hero inline-block border border-yc text-yc px-4 py-1.5 text-xs font-sans font-bold tracking-widest uppercase mb-8 rounded-full">
+                Interactive Data Story
+            </div>
+            <h1 class="gsap-hero text-6xl md:text-8xl lg:text-9xl font-sans font-black tracking-tighter mb-8 leading-[0.9]">
+                The Sovereign <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-yc to-orange-400">Market-Maker</span>
+            </h1>
+            <p class="gsap-hero text-xl md:text-2xl font-serif font-light text-gray-300 max-w-2xl mx-auto leading-relaxed mb-12">
+                From artisan practice to a trillion-dollar engine. How Y Combinator institutionalized global innovation as of 2026.
+            </p>
+            <div class="gsap-hero animate-bounce text-gray-500 mt-12">
+                <i class="fa-solid fa-arrow-down text-2xl"></i>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- The Macro Context -->
+        <section id="scale" class="py-24 md:py-32 px-6 border-b border-gray-200">
+            <div class="max-w-3xl mx-auto">
+                <p class="drop-cap text-xl md:text-2xl font-serif leading-relaxed text-gray-800 gsap-reveal mb-16">
+                    Y Combinator is no longer just a startup accelerator. By 2026, it operates as a sovereign financial state—a gravitational anomaly that bends technical talent, early-stage capital, and technological momentum toward its campus in San Francisco. Under the leadership of Garry Tan, YC shed its auxiliary limbs (Continuity and Research) to focus obsessively on its core engine: the seed stage.
+                </p>
+
+                <h2 class="text-sm font-sans font-bold tracking-widest text-gray-400 uppercase mb-8 text-center gsap-reveal">The 2026 Footprint</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+                    <div class="gsap-reveal border-l-4 border-yc pl-4">
+                        <div class="text-4xl md:text-5xl font-sans font-black tracking-tighter counter" data-target="1000">0</div>
+                        <div class="text-sm font-sans font-semibold text-gray-500 mt-1 uppercase tracking-wide">Billion $ Valued</div>
+                    </div>
+                    <div class="gsap-reveal border-l-4 border-yc pl-4" style="transition-delay: 100ms">
+                        <div class="text-4xl md:text-5xl font-sans font-black tracking-tighter"><span class="counter" data-target="5000">0</span>+</div>
+                        <div class="text-sm font-sans font-semibold text-gray-500 mt-1 uppercase tracking-wide">Companies</div>
+                    </div>
+                    <div class="gsap-reveal border-l-4 border-yc pl-4" style="transition-delay: 200ms">
+                        <div class="text-4xl md:text-5xl font-sans font-black tracking-tighter"><span class="counter" data-target="0.6" data-decimals="1">0</span>%</div>
+                        <div class="text-sm font-sans font-semibold text-gray-500 mt-1 uppercase tracking-wide">Acceptance Rate</div>
+                    </div>
+                    <div class="gsap-reveal border-l-4 border-yc pl-4" style="transition-delay: 300ms">
+                        <div class="text-4xl md:text-5xl font-sans font-black tracking-tighter"><span class="counter" data-target="87">0</span>%</div>
+                        <div class="text-sm font-sans font-semibold text-gray-500 mt-1 uppercase tracking-wide">Survival Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Deal Architecture -->
+        <section id="deal" class="py-24 md:py-32 px-6 bg-paper-dark">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div class="gsap-reveal">
+                        <h2 class="text-4xl md:text-5xl font-sans font-black tracking-tighter mb-6">The $500k Deal Mechanics</h2>
+                        <p class="text-lg font-serif text-gray-700 leading-relaxed mb-6">
+                            The standard deal is elegant, non-negotiable, and heavily favors the accelerator in downside scenarios while participating in the upside. It bifurcates into two instruments:
+                        </p>
+                        <ul class="space-y-6 mb-8 font-sans">
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 rounded-full bg-yc text-white flex items-center justify-center font-bold mr-4 shrink-0 mt-1"><i class="fa-solid fa-lock"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-xl">The Fixed Stake</h4>
+                                    <p class="text-gray-600">$125,000 for a guaranteed 7% ownership on a post-money SAFE.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center font-bold mr-4 shrink-0 mt-1"><i class="fa-solid fa-scale-balanced"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-xl">The Variable Stake (MFN)</h4>
+                                    <p class="text-gray-600">$375,000 on an Uncapped SAFE with a "Most Favored Nation" provision. It converts at the lowest valuation cap the startup negotiates with subsequent investors.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Calculator Widget -->
+                    <div class="gsap-reveal bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-gray-100 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-paper-dark rounded-bl-full -z-10 opacity-50"></div>
+                        
+                        <h3 class="font-sans font-bold text-sm tracking-widest text-gray-400 uppercase mb-6">Interactive Dilution Modeler</h3>
+                        <p class="font-serif text-sm text-gray-600 mb-6">Select a hypothetical next-round valuation to see how YC's ownership adjusts.</p>
+
+                        <div class="flex gap-2 mb-10 bg-gray-100 p-1 rounded-lg">
+                            <button class="calc-btn flex-1 py-2 font-sans font-bold text-sm rounded-md transition-all bg-white shadow-sm text-ink" data-val="5">Low ($5M)</button>
+                            <button class="calc-btn flex-1 py-2 font-sans font-bold text-sm rounded-md transition-all text-gray-500 hover:text-ink" data-val="10">Avg ($10M)</button>
+                            <button class="calc-btn flex-1 py-2 font-sans font-bold text-sm rounded-md transition-all text-gray-500 hover:text-ink" data-val="20">Hot ($20M)</button>
+                            <button class="calc-btn flex-1 py-2 font-sans font-bold text-sm rounded-md transition-all text-gray-500 hover:text-ink" data-val="40">AI ($40M)</button>
+                        </div>
+
+                        <!-- Visual Bar -->
+                        <div class="mb-8">
+                            <div class="flex justify-between font-sans text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">
+                                <span>YC Total Ownership</span>
+                                <span id="total-pct-text" class="text-yc text-lg">14.5%</span>
+                            </div>
+                            <div class="w-full h-8 bg-gray-100 rounded-full overflow-hidden flex">
+                                <!-- Fixed 7% -->
+                                <div class="h-full bg-ink calc-bar flex items-center justify-center text-xs text-white font-bold" style="width: 25%" id="bar-fixed">
+                                    7%
+                                </div>
+                                <!-- Variable MFN -->
+                                <div class="h-full bg-yc calc-bar flex items-center justify-center text-xs text-white font-bold" style="width: 25%" id="bar-var">
+                                    7.5%
+                                </div>
+                            </div>
+                            <div class="flex justify-between font-sans text-xs text-gray-400 mt-2">
+                                <span>Fixed ($125k)</span>
+                                <span>Variable ($375k)</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-paper p-4 rounded-lg border border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <span class="font-sans font-semibold text-gray-700">Founder Dilution Impact:</span>
+                                <span class="font-sans font-black text-red-500 uppercase tracking-wide" id="impact-text">High</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Funnel -->
+        <section id="crucible" class="py-24 md:py-32 px-6 bg-ink text-white overflow-hidden">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="gsap-reveal text-4xl md:text-6xl font-sans font-black tracking-tighter mb-8">The Selection Crucible</h2>
+                <p class="gsap-reveal text-xl font-serif text-gray-400 leading-relaxed max-w-2xl mx-auto mb-16">
+                    Harder to enter than Harvard, Stanford, or MIT. The application is designed to filter out obfuscation. If you cannot explain your product concisely, you fail the initial read.
+                </p>
+
+                <!-- Funnel Visualization -->
+                <div class="gsap-reveal max-w-2xl mx-auto space-y-4 font-sans font-bold text-sm uppercase tracking-wider">
+                    <!-- Step 1 -->
+                    <div class="relative group">
+                        <div class="flex justify-between mb-1 px-2"><span>Total Applications</span><span>40,000+</span></div>
+                        <div class="w-full bg-gray-800 h-12 rounded-lg flex items-center justify-center overflow-hidden relative">
+                            <div class="absolute inset-0 bg-gray-700 w-full"></div>
+                            <span class="relative z-10">100%</span>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="relative group pt-2">
+                        <div class="flex justify-between mb-1 px-2 text-gray-300"><span>Invited to Interview</span><span>~2,000</span></div>
+                        <div class="mx-auto w-[60%] bg-gray-800 h-12 rounded-lg flex items-center justify-center overflow-hidden relative transition-all duration-500 hover:w-[65%]">
+                            <div class="absolute inset-0 bg-gray-600 w-full"></div>
+                            <span class="relative z-10">5.0%</span>
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="relative group pt-2">
+                        <div class="flex justify-between mb-1 px-2 text-gray-400"><span>Accepted</span><span>~250</span></div>
+                        <div class="mx-auto w-[25%] bg-gray-800 h-12 rounded-lg flex items-center justify-center overflow-hidden relative transition-all duration-500 hover:w-[30%] shadow-[0_0_30px_rgba(242,101,34,0.3)]">
+                            <div class="absolute inset-0 bg-yc w-full"></div>
+                            <span class="relative z-10 text-white">0.6%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interview Criteria -->
+                <div class="gsap-reveal mt-24 grid grid-cols-1 md:grid-cols-2 gap-8 text-left border-t border-gray-800 pt-16">
+                    <div class="col-span-full mb-4">
+                        <h3 class="text-2xl font-sans font-bold text-yc">The 10-Minute Interrogation</h3>
+                        <p class="font-serif text-gray-400 mt-2">No decks. No small talk. Rapid-fire testing across four vectors:</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-yc transition-colors">
+                        <h4 class="font-sans font-bold text-lg mb-2"><i class="fa-solid fa-brain text-yc mr-2"></i> Problem Space</h4>
+                        <p class="text-sm text-gray-400 font-serif">Do founders have deep, often personal familiarity with an obscure but valuable problem?</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-yc transition-colors">
+                        <h4 class="font-sans font-bold text-lg mb-2"><i class="fa-solid fa-chart-line text-yc mr-2"></i> Market Dynamics</h4>
+                        <p class="text-sm text-gray-400 font-serif">Is the TAM real? Why is now the exact right time to build this? (The "Why Now" vector).</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-yc transition-colors">
+                        <h4 class="font-sans font-bold text-lg mb-2"><i class="fa-solid fa-rocket text-yc mr-2"></i> Velocity</h4>
+                        <p class="text-sm text-gray-400 font-serif">Can this team ship? Evidence of rapid iteration, initial traction, or paying users.</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-yc transition-colors">
+                        <h4 class="font-sans font-bold text-lg mb-2"><i class="fa-solid fa-users text-yc mr-2"></i> Chemistry</h4>
+                        <p class="text-sm text-gray-400 font-serif">Irrational determination and evidence the founders won't break under extreme pressure.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Visualization: The End of Remote Work -->
+        <section id="data" class="py-24 md:py-32 px-6 bg-paper border-b border-gray-200">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-col lg:flex-row gap-16">
+                    <div class="w-full lg:w-1/3 gsap-reveal">
+                        <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-chart-pie text-xl"></i>
+                        </div>
+                        <h2 class="text-4xl font-sans font-black tracking-tighter mb-6">The Collapse of Remote Work</h2>
+                        <p class="font-serif text-lg text-gray-700 leading-relaxed mb-6">
+                            Perhaps the most striking macroeconomic signal from the YC dataset. After peaking during the pandemic, the tolerance for fully remote founding teams has evaporated.
+                        </p>
+                        <blockquote class="border-l-4 border-yc pl-4 font-serif italic text-gray-600 mb-8">
+                            "Physical proximity dramatically accelerates iteration speed and cultural cohesion. In an AI-native world, velocity is the only moat."
+                        </blockquote>
+                    </div>
+                    
+                    <div class="w-full lg:w-2/3 gsap-reveal chart-container bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <!-- ChartJS Canvas -->
+                        <canvas id="remoteChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Requests for Startups -->
+        <section class="py-24 md:py-32 px-6 bg-paper-dark">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 gsap-reveal">
+                    <h2 class="text-4xl md:text-5xl font-sans font-black tracking-tighter mb-6">2026 Requests for Startups</h2>
+                    <p class="font-serif text-xl text-gray-600 max-w-3xl mx-auto">Telegraphing massive unmet demand. The focus is strictly "AI-native", deflationary costs, and reindustrializing the physical world.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+                    <!-- RFS Cards -->
+                    <div class="gsap-reveal bg-white p-8 rounded-xl border-t-4 border-t-yc shadow-sm hover:-translate-y-1 transition-transform duration-300">
+                        <h3 class="font-bold text-xl mb-3">AI-Native Agencies</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Instead of selling SaaS tools, founders use internal AI to deliver finished, custom products (law, ads, design) at software margins.</p>
+                    </div>
+                    <div class="gsap-reveal bg-white p-8 rounded-xl border-t-4 border-t-gray-800 shadow-sm hover:-translate-y-1 transition-transform duration-300" style="transition-delay: 100ms">
+                        <h3 class="font-bold text-xl mb-3">Modernizing Metal</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Rebuilding American industrial foundations using AI-driven planning, modern automation, and next-gen manufacturing.</p>
+                    </div>
+                    <div class="gsap-reveal bg-white p-8 rounded-xl border-t-4 border-t-gray-800 shadow-sm hover:-translate-y-1 transition-transform duration-300" style="transition-delay: 200ms">
+                        <h3 class="font-bold text-xl mb-3">Spatial Models</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Foundational models treating 3D geometry as native primitives; a necessary precursor to physical-world AGI and robotics.</p>
+                    </div>
+                    <div class="gsap-reveal bg-white p-8 rounded-xl border-t-4 border-t-gray-800 shadow-sm hover:-translate-y-1 transition-transform duration-300">
+                        <h3 class="font-bold text-xl mb-3">Stablecoin Rails</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Leveraging regulatory clarity to build mainstream yield accounts, B2B cross-border payment rails, and FX layers.</p>
+                    </div>
+                    <div class="gsap-reveal bg-white p-8 rounded-xl border-t-4 border-t-gray-800 shadow-sm hover:-translate-y-1 transition-transform duration-300" style="transition-delay: 100ms">
+                        <h3 class="font-bold text-xl mb-3">AI Hedge Funds</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Autonomous agentic clusters ingesting real-time data, 10-Ks, and SEC filings to instantly generate and execute novel trading strategies.</p>
+                    </div>
+                    <div class="gsap-reveal bg-white p-8 rounded-xl border-t-4 border-t-gray-800 shadow-sm hover:-translate-y-1 transition-transform duration-300" style="transition-delay: 200ms">
+                        <h3 class="font-bold text-xl mb-3">Physical Guidance</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">Multimodal models deployed via Smart Glasses providing real-time coaching for manufacturing, defense, and healthcare.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-ink text-gray-500 py-16 text-center font-sans">
+        <div class="max-w-2xl mx-auto px-6">
+            <div class="font-black text-2xl tracking-tighter text-white mb-6">YC<span class="text-yc">2026</span></div>
+            <p class="mb-8 font-serif italic text-gray-400">
+                "Y Combinator ensures that it will not simply predict the future of the global economy, but will systematically construct it."
+            </p>
+            <div class="text-xs tracking-widest uppercase flex justify-center space-x-4">
+                <span>Interactive Data Story</span>
+                <span>•</span>
+                <span>Generated Analysis</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- GSAP & ScrollTrigger CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // --- 1. General UI / Navbar / Progress Bar ---
+        const navbar = document.getElementById('navbar');
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            // Reading Progress Bar
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+
+            // Navbar hide/show
+            if (lastScrollY < window.scrollY && window.scrollY > 100) {
+                navbar.style.transform = "translateY(-100%)";
+            } else {
+                navbar.style.transform = "translateY(0)";
+            }
+            lastScrollY = window.scrollY;
+        });
+
+        // --- 2. GSAP Animations ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero Animation
+        gsap.from(".gsap-hero", {
+            y: 50,
+            opacity: 0,
+            duration: 1.2,
+            stagger: 0.2,
+            ease: "power3.out",
+            delay: 0.2
+        });
+
+        // Scroll Reveal Animation for generic elements
+        gsap.utils.toArray('.gsap-reveal').forEach(elem => {
+            gsap.to(elem, {
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // Number Counter Animation
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            gsap.to(counter, {
+                scrollTrigger: {
+                    trigger: counter,
+                    start: "top 90%",
+                },
+                innerHTML: counter.getAttribute('data-target'),
+                duration: 2,
+                ease: "power2.out",
+                snap: { innerHTML: counter.getAttribute('data-decimals') ? 0.1 : 1 },
+                onUpdate: function() {
+                    if (counter.getAttribute('data-decimals')) {
+                        counter.innerHTML = Number(this.targets()[0].innerHTML).toFixed(1);
+                    } else {
+                        counter.innerHTML = Math.ceil(this.targets()[0].innerHTML);
+                    }
+                }
+            });
+        });
+
+        // --- 3. Interactive MFN Calculator Logic ---
+        const calcData = {
+            5:  { fixed: 7.0, variable: 7.50, impact: 'High Risk', impactColor: 'text-red-500' },
+            10: { fixed: 7.0, variable: 3.75, impact: 'Moderate', impactColor: 'text-orange-500' },
+            20: { fixed: 7.0, variable: 1.88, impact: 'Low', impactColor: 'text-yellow-500' },
+            40: { fixed: 7.0, variable: 0.94, impact: 'Minimal', impactColor: 'text-green-500' }
+        };
+
+        const calcBtns = document.querySelectorAll('.calc-btn');
+        const barFixed = document.getElementById('bar-fixed');
+        const barVar = document.getElementById('bar-var');
+        const totalPctText = document.getElementById('total-pct-text');
+        const impactText = document.getElementById('impact-text');
+
+        function updateCalculator(val) {
+            const data = calcData[val];
+            const total = (data.fixed + data.variable).toFixed(2);
+            
+            // Math for bar widths (relative scaling for visual effect, assuming max ~15%)
+            const maxDisplay = 15; 
+            const fixedWidth = (data.fixed / maxDisplay) * 100;
+            const varWidth = (data.variable / maxDisplay) * 100;
+
+            // Update UI
+            barFixed.style.width = `${fixedWidth}%`;
+            barVar.style.width = `${varWidth}%`;
+            barVar.innerText = `${data.variable}%`;
+            totalPctText.innerText = `${total}%`;
+            
+            impactText.innerText = data.impact;
+            impactText.className = `font-sans font-black uppercase tracking-wide ${data.impactColor}`;
+
+            // Update button styles
+            calcBtns.forEach(btn => {
+                if(btn.dataset.val == val) {
+                    btn.className = "calc-btn flex-1 py-2 font-sans font-bold text-sm rounded-md transition-all bg-white shadow-sm text-ink";
+                } else {
+                    btn.className = "calc-btn flex-1 py-2 font-sans font-bold text-sm rounded-md transition-all text-gray-500 hover:text-ink";
+                }
+            });
+        }
+
+        calcBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => updateCalculator(e.target.dataset.val));
+        });
+
+        // --- 4. Chart.js Visualization (Remote Work) ---
+        const ctx = document.getElementById('remoteChart').getContext('2d');
+        let chartInstance = null;
+
+        const initChart = () => {
+            if (chartInstance) return; // Prevent re-initialization
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026'],
+                    datasets: [{
+                        label: '% Fully Remote Startups',
+                        data: [33.6, 83.4, 77.6, 47.9, 31.2, 14.2, 19.8],
+                        backgroundColor: (context) => {
+                            const value = context.raw;
+                            // Highlight the drop with YC orange
+                            return value < 40 ? '#f26522' : '#e5e7eb';
+                        },
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#111',
+                            titleFont: { family: 'Inter', size: 14 },
+                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) { return context.raw + '% Remote'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: '#f3f4f6', drawBorder: false },
+                            ticks: { font: { family: 'Inter' }, color: '#9ca3af', callback: function(value) { return value + '%' } }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { font: { family: 'Inter', weight: 'bold' }, color: '#4b5563' }
+                        }
+                    }
+                }
+            });
+        };
+
+        // Trigger chart animation when scrolled into view
+        ScrollTrigger.create({
+            trigger: "#remoteChart",
+            start: "top 80%",
+            onEnter: () => initChart()
+        });
+
+    </script>
+</body>
+</html>
