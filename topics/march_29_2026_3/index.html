@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL 2026: The Evolution of Fan Storytelling</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stonebg: '#f5f5f4',
+                        cardbg: '#ffffff',
+                        primary: '#1e293b',
+                        secondary: '#475569',
+                        accent: '#c2410c',
+                        accentlight: '#ffedd5'
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'sans-serif'],
+                        serif: ['Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f5f5f4;
+            color: #1e293b;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        .interactive-btn {
+            transition: all 0.2s ease;
+        }
+        .interactive-btn.active {
+            background-color: #c2410c;
+            color: white;
+            border-color: #c2410c;
+        }
+        .unicode-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+            margin-right: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased pb-12">
+
+    <!-- Chosen Palette: Warm Neutral Harmony (Stonebg: #f5f5f4, Cardbg: #ffffff, Text: #1e293b, Accent: #c2410c) -->
+    <!-- Application Structure Plan: A tabbed interface dashboard. This structure was chosen because "Emerging Storytelling" in the IPL consists of distinct, parallel modalities (Transmedia, Spatial, Agentic, Data). A tabbed layout allows users to deeply explore one narrative mode at a time without cognitive overload, comparing the "User POV" across different tech paradigms while maintaining a clean, easily navigable single-page experience. -->
+    <!-- Visualization & Content Choices: 1. Transmedia: HTML flow diagram & Bar Chart (Chart.js) to show engagement distribution. 2. Spatial: Interactive HTML text toggle to simulate changing PoV, Radar Chart (Chart.js) comparing sensory input. 3. Agentic AI: Dynamic text injection simulating AI persona changes, Line chart showing emotional engagement. 4. Journalism: Scatter plot (Chart.js) showing data clustering, allowing filtering to find the 'story' in the data. NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-cardbg border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-primary tracking-tight">
+                <span class="unicode-icon">&#x1F3CF;</span> IPL 2026: The Evolution of Fan Storytelling
+            </h1>
+            <p class="mt-2 text-secondary text-lg max-w-3xl">
+                Explore how emerging technologies have fundamentally rewritten the Indian Premier League experience. We transition from passive viewership to active, personalized, and immersive narrative ecosystems. Select a storytelling modality below to experience the shift from the user's point of view.
+            </p>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex overflow-x-auto space-x-1 border-b-2 border-gray-100 pb-px" aria-label="Tabs">
+                <button onclick="switchTab('transmedia')" id="tab-transmedia" class="tab-btn active text-accent border-b-2 border-accent py-3 px-4 text-sm font-bold whitespace-nowrap focus:outline-none">
+                    <span class="unicode-icon">&#x1F310;</span> Transmedia Universes
+                </button>
+                <button onclick="switchTab('spatial')" id="tab-spatial" class="tab-btn text-secondary hover:text-primary py-3 px-4 text-sm font-medium whitespace-nowrap border-b-2 border-transparent focus:outline-none">
+                    <span class="unicode-icon">&#x1F4FD;</span> Spatial Computing
+                </button>
+                <button onclick="switchTab('agentic')" id="tab-agentic" class="tab-btn text-secondary hover:text-primary py-3 px-4 text-sm font-medium whitespace-nowrap border-b-2 border-transparent focus:outline-none">
+                    <span class="unicode-icon">&#x1F916;</span> Agentic AI Narrators
+                </button>
+                <button onclick="switchTab('journalism')" id="tab-journalism" class="tab-btn text-secondary hover:text-primary py-3 px-4 text-sm font-medium whitespace-nowrap border-b-2 border-transparent focus:outline-none">
+                    <span class="unicode-icon">&#x1F4CA;</span> Immersive Data Journalism
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section id="content-transmedia" class="tab-content active">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-primary mb-3">Transmedia Ecosystems: The 24/7 Narrative Loop</h2>
+                <p class="text-secondary leading-relaxed bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <strong>Purpose:</strong> This section explores how the IPL narrative is no longer confined to a three-hour broadcast. It demonstrates how "Living Narratives" sprawl across multiple platforms—fantasy leagues, behind-the-scenes docuseries, social media lore, and physical fan parks—creating a persistent, interconnected universe. From the user's perspective, the story of a single match begins days before the coin toss and continues long after the final ball, transforming fans from passive viewers into active participants in a decentralized story ecosystem.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-primary mb-4">The User POV: A Fragmented Yet Unified Journey</h3>
+                    <p class="text-sm text-secondary mb-6 leading-relaxed">
+                        In traditional broadcasting, the story was linear: you watched the pre-match show, the match, and the post-match analysis. Today, the IPL utilizes the "Fans First 4D Framework." As a fan, you discover character arcs through player Instagram reels (Definition), analyze strategic depth via interactive fantasy drafting platforms (Development), experience the climax via the live broadcast, and engage in post-match community debates on Discord servers managed by the franchise (Delivery). The cognitive space between these platforms is where true emotional investment is forged.
+                    </p>
+                    
+                    <h4 class="font-semibold text-primary mb-3">Interactive Fan Journey Modeler</h4>
+                    <p class="text-xs text-secondary mb-3">Select a fan archetype to see how their weekly IPL narrative is constructed across different media nodes.</p>
+                    
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="updateTransmediaJourney('casual')" id="btn-journey-casual" class="interactive-btn active px-4 py-2 text-sm border border-gray-300 rounded-md text-primary font-medium hover:bg-gray-50">Casual Fan</button>
+                        <button onclick="updateTransmediaJourney('hardcore')" id="btn-journey-hardcore" class="interactive-btn px-4 py-2 text-sm border border-gray-300 rounded-md text-primary font-medium hover:bg-gray-50">Hardcore Transmedia Fan</button>
+                    </div>
+
+                    <div id="journey-display" class="bg-stonebg p-4 rounded-lg border border-gray-200">
+                        <div class="flex flex-col space-y-3">
+                            <div class="flex items-center">
+                                <span class="w-24 text-xs font-bold text-secondary uppercase">Match -2 Days</span>
+                                <div class="h-2 w-2 rounded-full bg-accent mr-3"></div>
+                                <span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200">Sees highlight reel on social feed.</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-24 text-xs font-bold text-secondary uppercase">Match Day</span>
+                                <div class="h-2 w-2 rounded-full bg-accent mr-3"></div>
+                                <span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200">Watches live TV broadcast (3 hours).</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-24 text-xs font-bold text-secondary uppercase">Match +1 Day</span>
+                                <div class="h-2 w-2 rounded-full bg-accent mr-3"></div>
+                                <span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200">Reads newspaper summary.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="text-xl font-bold text-primary mb-2">Narrative Attention Distribution</h3>
+                    <p class="text-sm text-secondary mb-4">Analyzing how storytelling modalities capture cumulative weekly fan attention (in hours) beyond the core broadcast.</p>
+                    <div class="flex-grow flex items-center justify-center">
+                        <div class="chart-container">
+                            <canvas id="transmediaChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-spatial" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-primary mb-3">Spatial Computing: The Frameless Stadium</h2>
+                <p class="text-secondary leading-relaxed bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <strong>Purpose:</strong> This section examines the impact of AR, VR, and object-based audio on sports consumption. It highlights how spatial storytelling solves the "Director's Dilemma" by placing the user inside the narrative environment. Here, you will understand how shifting from a flat 16:9 rectangle to a 360-degree volumetric space fundamentally alters cognitive processing, making the fan the real-time director of their own viewing experience through physical movement and diegetic focus.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <div class="lg:col-span-1 bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-primary mb-4">The User POV: Director of the Match</h3>
+                    <p class="text-sm text-secondary mb-4 leading-relaxed">
+                        Traditional TV dictates what you see. If the director cuts to the crowd, you miss the bowler's reaction. In 2026's Spatial IPL broadcasts via headsets or advanced AR projections, the media is "frameless." 
+                    </p>
+                    <p class="text-sm text-secondary mb-6 leading-relaxed">
+                        You are seated virtually behind the wicketkeeper. You want to see the fielding captain at mid-off adjusting the slip cordon? You literally turn your head. This freedom creates the "Director's Dilemma"—how do broadcasters ensure you don't miss a crucial wicket while looking away? They use subtle spatial audio cues (a heightened stump-mic crack) to instinctively pull your gaze back to the "Region of Interest" (ROI).
+                    </p>
+
+                    <h4 class="font-semibold text-primary mb-3">Volumetric Viewpoint Selector</h4>
+                    <p class="text-xs text-secondary mb-3">Select a spatial viewpoint to understand how the storytelling perspective changes.</p>
+                    
+                    <div class="flex flex-col space-y-2 mb-4">
+                        <button onclick="updateSpatialView('umpire')" id="btn-spatial-umpire" class="interactive-btn active w-full text-left px-4 py-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-accentlight hover:border-accent">
+                            <span class="font-bold block text-primary">Umpire's Volumetric Cam</span>
+                            <span class="text-xs text-secondary font-normal">Center of the action, high sensory load.</span>
+                        </button>
+                        <button onclick="updateSpatialView('dugout')" id="btn-spatial-dugout" class="interactive-btn w-full text-left px-4 py-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-accentlight hover:border-accent">
+                            <span class="font-bold block text-primary">The Virtual Dugout</span>
+                            <span class="text-xs text-secondary font-normal">Side-on perspective, focus on player interactions.</span>
+                        </button>
+                        <button onclick="updateSpatialView('tabletop')" id="btn-spatial-tabletop" class="interactive-btn w-full text-left px-4 py-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-accentlight hover:border-accent">
+                            <span class="font-bold block text-primary">AR Tabletop Projection</span>
+                            <span class="text-xs text-secondary font-normal">God-view, highly tactical and data-rich.</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100 min-h-[200px] flex flex-col justify-center">
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-accent mb-2">Active Experience Simulation</h4>
+                        <div id="spatial-description" class="p-6 bg-stonebg border-l-4 border-accent rounded-r-lg">
+                            <h5 class="text-lg font-bold text-primary mb-2">Sensory Immersion: The Umpire's View</h5>
+                            <p class="text-sm text-secondary leading-relaxed">
+                                You are virtually standing at the non-striker's end. A 150km/h delivery rushes past you. The spatial audio allows you to hear the heavy breathing of the bowler running in from behind your left shoulder, followed by the terrifying physical crack of leather on willow directly in front of you. You instinctively flinch. The storytelling here is purely physical and deeply visceral, generating immense physiological arousal and empathy, though you might struggle to recall the exact field placement later due to cognitive overload.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                        <h3 class="text-xl font-bold text-primary mb-2">Cognitive Trade-off: Flat TV vs. Immersive VR</h3>
+                        <p class="text-sm text-secondary mb-4">Immersive media causes high physiological arousal but diminishes cued recall of specific semantic facts compared to flat screens.</p>
+                        <div class="flex-grow flex items-center justify-center">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="spatialChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-agentic" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-primary mb-3">Agentic AI Narrators: The Co-Pilot Fan Experience</h2>
+                <p class="text-secondary leading-relaxed bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <strong>Purpose:</strong> This section demonstrates the shift from standardized, mass-broadcast commentary to hyper-personalized, dynamically generated AI narratives. You will interact with an interface that simulates how Agentic AI acts as a "creative director" on the fly, tailoring the emotional tone, vocabulary, and tactical depth of the story specifically to individual fan biases and preferences, fundamentally altering the concept of a shared narrative reality.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-primary mb-4">The User POV: The Death of the Universal Broadcast</h3>
+                    <p class="text-sm text-secondary mb-4 leading-relaxed">
+                        Historically, millions heard the same voice describe a match-winning six. It was a shared cultural moment, but one that could frustrate fans if the commentator seemed biased against their team. 
+                    </p>
+                    <p class="text-sm text-secondary mb-6 leading-relaxed">
+                        Enter the Agentic AI Narrator. Utilizing Large Language Models integrated with live telemetry data, the AI generates real-time audio commentary tailored strictly to your profile. If you are a Mumbai Indians superfan, the AI adopts the persona of an "Ally"—mourning wickets and celebrating boundaries with localized slang. If you prefer deep data, the AI becomes an "Augmenter," ignoring the crowd noise to explain the biomechanics of a spinner's wrist position. The story is no longer broadcast; it is uniquely synthesized for you.
+                    </p>
+
+                    <h4 class="font-semibold text-primary mb-3">AI Commentary Synthesis Sandbox</h4>
+                    <p class="text-xs text-secondary mb-3">Scenario: <em>Last ball of the innings, 4 runs required. The batter hits it high into the night sky over long-on. It clears the rope.</em> Select your AI Persona setting:</p>
+                    
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="updateAgenticAudio('neutral')" id="btn-agentic-neutral" class="interactive-btn active px-3 py-1.5 text-sm border border-gray-300 rounded text-primary hover:bg-gray-50">Traditional / Neutral</button>
+                        <button onclick="updateAgenticAudio('fanatic')" id="btn-agentic-fanatic" class="interactive-btn px-3 py-1.5 text-sm border border-gray-300 rounded text-primary hover:bg-gray-50">Franchise Fanatic (Ally)</button>
+                        <button onclick="updateAgenticAudio('tactical')" id="btn-agentic-tactical" class="interactive-btn px-3 py-1.5 text-sm border border-gray-300 rounded text-primary hover:bg-gray-50">Data Tactician (Augmenter)</button>
+                    </div>
+
+                    <div class="p-5 bg-gray-900 rounded-lg relative overflow-hidden">
+                        <div class="absolute top-2 right-2 flex space-x-1">
+                            <div class="w-1.5 h-4 bg-green-500 rounded-full animate-pulse"></div>
+                            <div class="w-1.5 h-3 bg-green-500 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                            <div class="w-1.5 h-5 bg-green-500 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                        </div>
+                        <span class="text-xs text-gray-400 font-mono block mb-2">LIVE AUDIO TRANSCRIPT GENERATION...</span>
+                        <p id="agentic-transcript" class="text-sm text-white font-serif italic leading-relaxed">
+                            "He steps out, swings hard... it's up in the air! Has he got enough? Yes he has! A spectacular finish to the match, clearing the long-on boundary for a massive six to seal the victory!"
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="text-xl font-bold text-primary mb-2">Emotional Resonance Tracking</h3>
+                    <p class="text-sm text-secondary mb-4">Comparing user sentimental alignment and engagement spikes during a match using standardized vs. personalized AI commentary.</p>
+                    <div class="flex-grow flex items-center justify-center">
+                        <div class="chart-container">
+                            <canvas id="agenticChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-journalism" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-primary mb-3">Immersive Data Journalism: Vibe-Coding the Pitch</h2>
+                <p class="text-secondary leading-relaxed bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <strong>Purpose:</strong> This section unpacks how complex, ball-by-ball quantitative data is translated into interactive visual stories. It explains the concept of "vibe-coding"—where fans or journalists use natural language to instantly generate custom data visualizations, bypassing traditional coding. This transforms static post-match statistics into dynamic tools, allowing users to actively explore correlations, uncover hidden tactical narratives (like a bowler's specific weakness), and validate their own sports theories visually.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+                <div class="lg:col-span-4 bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-primary mb-4">The User POV: The Analytical Storyteller</h3>
+                    <p class="text-sm text-secondary mb-4 leading-relaxed">
+                        In the past, analysts handed you a printed wagon wheel or a spreadsheet of strike rates. The story was static. Today, Immersive Data Journalism treats data not as a result, but as an interactive landscape to be explored.
+                    </p>
+                    <p class="text-sm text-secondary mb-6 leading-relaxed">
+                        Through "Vibe-coding," a user can type a prompt like: <em>"Show me every delivery faced by the captain in the middle overs, plotting bat speed against run probability."</em> The system instantly generates an interactive visual. The fan becomes the data journalist, filtering noise to find the structural metrics of engagement. You aren't just reading that a team struggled against pace; you are visually proving it by manipulating the dataset yourself.
+                    </p>
+
+                    <div class="bg-stonebg p-4 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-primary text-sm mb-2">Simulated Vibe-Code Prompt Console</h4>
+                        <p class="text-xs text-secondary mb-3 italic">"Filter match data to reveal tactical momentum clustering based on bowling type."</p>
+                        
+                        <div class="flex flex-col space-y-2">
+                            <button onclick="updateJournalismFilter('all')" id="btn-filter-all" class="interactive-btn active text-left px-3 py-2 text-sm border border-gray-300 rounded bg-white text-primary">
+                                <span class="unicode-icon text-xs">&#x25CF;</span> Show All Deliveries
+                            </button>
+                            <button onclick="updateJournalismFilter('pace')" id="btn-filter-pace" class="interactive-btn text-left px-3 py-2 text-sm border border-gray-300 rounded bg-white text-primary">
+                                <span class="unicode-icon text-xs text-red-500">&#x25CF;</span> Filter: Fast Bowling Only (Pace)
+                            </button>
+                            <button onclick="updateJournalismFilter('spin')" id="btn-filter-spin" class="interactive-btn text-left px-3 py-2 text-sm border border-gray-300 rounded bg-white text-primary">
+                                <span class="unicode-icon text-xs text-blue-500">&#x25CF;</span> Filter: Spin Bowling Only (Turn)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 bg-cardbg p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-xl font-bold text-primary">Interactive Delivery Scatter Plot</h3>
+                            <p class="text-sm text-secondary">Mapping Pitch Length (X) vs. Strike Rate Generated (Y). Identify the tactical 'hot zones' that defined the match narrative.</p>
+                        </div>
+                        <div class="bg-accentlight text-accent text-xs font-bold px-3 py-1 rounded-full border border-orange-200">
+                            Live Dataset
+                        </div>
+                    </div>
+                    
+                    <div class="flex-grow flex items-center justify-center mt-4 bg-stonebg rounded-lg border border-gray-100 p-2">
+                        <div class="chart-container" style="height: 400px; max-width: 100%;">
+                            <canvas id="journalismChart"></canvas>
+                        </div>
+                    </div>
+                    <p id="journalism-insight" class="text-sm font-medium text-primary mt-4 text-center bg-white py-2 px-4 rounded border border-gray-200 shadow-sm">
+                        Insight: Viewing full match data. Notice the broad spread of scoring opportunities across all lengths.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            activeTab: 'transmedia'
+        };
+
+        // --- Data Storage ---
+        // Transmedia Data
+        const transmediaData = {
+            labels: ['Live Broadcast', 'Social Highlights', 'Fantasy Draft/Stats', 'Community/Forums', 'Docuseries/Vlogs'],
+            casual: [3, 1, 0.5, 0, 0],
+            hardcore: [3, 2, 2.5, 1.5, 2]
+        };
+
+        // Spatial Data
+        const spatialData = {
+            labels: ['Visual Breadth (FoV)', 'Physiological Arousal', 'Empathy/Presence', 'Specific Fact Recall', 'Multi-tasking Ability'],
+            flatTV: [40, 50, 45, 90, 85],
+            vrSpatial: [95, 90, 95, 40, 15]
+        };
+
+        // Agentic AI Data
+        const agenticData = {
+            labels: ['Over 1', 'Over 5', 'Over 10', 'Over 15', 'Over 19', 'Over 20 (Climax)'],
+            standard: [40, 45, 50, 60, 75, 85],
+            personalized: [60, 65, 70, 85, 95, 100]
+        };
+
+        // Journalism Scatter Data (Mock Ball-by-Ball)
+        const generateScatterData = (type) => {
+            const data = [];
+            for(let i=0; i<40; i++) {
+                // X: Pitch Length (0=Yorker, 10=Short), Y: Strike Rate (0 to 250)
+                let x, y;
+                if (type === 'pace') {
+                    x = Math.random() * 6 + 4; // Tends shorter
+                    y = x > 7 ? Math.random() * 150 : Math.random() * 250 + 50; // Short balls mixed, full balls hit harder
+                } else if (type === 'spin') {
+                    x = Math.random() * 5 + 1; // Tends fuller
+                    y = x < 3 ? Math.random() * 100 : Math.random() * 200 + 20; // Very full is tight, good length gets hit
+                }
+                data.push({x: x, y: y});
+            }
+            return data;
+        };
+        const journalismBaseData = {
+            pace: generateScatterData('pace'),
+            spin: generateScatterData('spin')
+        };
+
+        // --- Chart Instances ---
+        let charts = {
+            transmedia: null,
+            spatial: null,
+            agentic: null,
+            journalism: null
+        };
+
+        // --- Core Interaction & Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            switchTab('transmedia'); // Initial load
+        });
+
+        function switchTab(tabId) {
+            // Update state
+            state.activeTab = tabId;
+
+            // UI Tab toggling
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active', 'text-accent', 'border-accent');
+                el.classList.add('text-secondary', 'border-transparent');
+            });
+
+            document.getElementById(`content-${tabId}`).classList.add('active');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.add('active', 'text-accent', 'border-accent');
+            activeBtn.classList.remove('text-secondary', 'border-transparent');
+
+            // Trigger chart resize/render to fix hidden canvas sizing issues
+            if (charts[tabId]) {
+                charts[tabId].resize();
+                charts[tabId].update();
+            }
+        }
+
+        // --- Transmedia Logic ---
+        function updateTransmediaJourney(type) {
+            // Update buttons
+            document.getElementById('btn-journey-casual').classList.remove('active', 'bg-accent', 'text-white', 'border-accent');
+            document.getElementById('btn-journey-hardcore').classList.remove('active', 'bg-accent', 'text-white', 'border-accent');
+            
+            const activeBtn = document.getElementById(`btn-journey-${type}`);
+            activeBtn.classList.add('active', 'bg-accent', 'text-white', 'border-accent');
+
+            // Update DOM HTML structure dynamically
+            const display = document.getElementById('journey-display');
+            if (type === 'casual') {
+                display.innerHTML = `
+                    <div class="flex flex-col space-y-3">
+                        <div class="flex items-center"><span class="w-24 text-xs font-bold text-secondary uppercase">Match -2 Days</span><div class="h-2 w-2 rounded-full bg-gray-300 mr-3"></div><span class="text-sm text-secondary italic">No engagement.</span></div>
+                        <div class="flex items-center"><span class="w-24 text-xs font-bold text-secondary uppercase">Match Day</span><div class="h-2 w-2 rounded-full bg-accent mr-3"></div><span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">Watches live TV broadcast (3 hrs).</span></div>
+                        <div class="flex items-center"><span class="w-24 text-xs font-bold text-secondary uppercase">Match +1 Day</span><div class="h-2 w-2 rounded-full bg-accent mr-3"></div><span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">Reads newspaper summary.</span></div>
+                    </div>
+                `;
+                charts.transmedia.data.datasets[0].data = transmediaData.casual;
+                charts.transmedia.data.datasets[0].label = 'Casual Fan Engagement (Hrs)';
+            } else {
+                display.innerHTML = `
+                    <div class="flex flex-col space-y-3">
+                        <div class="flex items-center"><span class="w-24 text-xs font-bold text-secondary uppercase">Match -2 Days</span><div class="h-2 w-2 rounded-full bg-accent mr-3"></div><span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">Analyzes player stats on Fantasy App.</span></div>
+                        <div class="flex items-center"><span class="w-24 text-xs font-bold text-secondary uppercase">Match -1 Day</span><div class="h-2 w-2 rounded-full bg-accent mr-3"></div><span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">Watches team's behind-the-scenes YouTube vlog.</span></div>
+                        <div class="flex items-center"><span class="w-24 text-xs font-bold text-secondary uppercase">Match Day</span><div class="h-2 w-2 rounded-full bg-accent mr-3"></div><span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">Attends physical LBE Fan Park in city center.</span></div>
+                        <div class="flex items-center"><span class="w-24 text-xs font-bold text-secondary uppercase">Match +1 Day</span><div class="h-2 w-2 rounded-full bg-accent mr-3"></div><span class="text-sm text-primary bg-white px-3 py-1 rounded border border-gray-200 shadow-sm">Debates tactics on Franchise Discord server.</span></div>
+                    </div>
+                `;
+                charts.transmedia.data.datasets[0].data = transmediaData.hardcore;
+                charts.transmedia.data.datasets[0].label = 'Hardcore Fan Engagement (Hrs)';
+            }
+            charts.transmedia.update();
+        }
+
+        // --- Spatial Logic ---
+        function updateSpatialView(view) {
+            // Update buttons
+            ['umpire', 'dugout', 'tabletop'].forEach(v => {
+                const btn = document.getElementById(`btn-spatial-${v}`);
+                btn.classList.remove('border-accent', 'bg-accentlight');
+                btn.classList.add('border-gray-200');
+            });
+            const activeBtn = document.getElementById(`btn-spatial-${view}`);
+            activeBtn.classList.remove('border-gray-200');
+            activeBtn.classList.add('border-accent', 'bg-accentlight');
+
+            // Update text content
+            const desc = document.getElementById('spatial-description');
+            if (view === 'umpire') {
+                desc.innerHTML = `
+                    <h5 class="text-lg font-bold text-primary mb-2">Sensory Immersion: The Umpire's View</h5>
+                    <p class="text-sm text-secondary leading-relaxed">You are virtually standing at the non-striker's end. A 150km/h delivery rushes past you. The spatial audio allows you to hear the heavy breathing of the bowler running in from behind your left shoulder, followed by the terrifying physical crack of leather on willow directly in front of you. You instinctively flinch. The storytelling here is purely physical and deeply visceral, generating immense physiological arousal and empathy, though you might struggle to recall the exact field placement later due to cognitive overload.</p>
+                `;
+            } else if (view === 'dugout') {
+                desc.innerHTML = `
+                    <h5 class="text-lg font-bold text-primary mb-2">Emotional Core: The Virtual Dugout</h5>
+                    <p class="text-sm text-secondary leading-relaxed">You are sitting next to the head coach. The field of view restricts the actual pitch to a side-angle, making tracking the ball difficult. However, the narrative focus shifts entirely to human emotion. You hear the hushed, nervous strategic whispers between the batting coach and the next man in. When a wicket falls, the sheer silence in your immediate spatial audio zone contrasts sharply with the distant roar of the stadium, framing the story as a psychological drama rather than an athletic contest.</p>
+                `;
+            } else {
+                desc.innerHTML = `
+                    <h5 class="text-lg font-bold text-primary mb-2">Tactical Omniscience: AR Tabletop Projection</h5>
+                    <p class="text-sm text-secondary leading-relaxed">The stadium is miniaturized and projected onto your coffee table via mixed reality glasses. You walk around the physical table to change your perspective. Physiological arousal drops as you are removed from human scale, but semantic understanding skyrockets. You can see the exact geometric gaps in the field setting that the captain is trying to exploit. The story told here is one of chess-like strategy and spatial geometry.</p>
+                `;
+            }
+        }
+
+        // --- Agentic AI Logic ---
+        function updateAgenticAudio(persona) {
+            // Update buttons
+            ['neutral', 'fanatic', 'tactical'].forEach(p => {
+                const btn = document.getElementById(`btn-agentic-${p}`);
+                btn.classList.remove('active', 'bg-accent', 'text-white', 'border-accent');
+                btn.classList.add('text-primary');
+            });
+            const activeBtn = document.getElementById(`btn-agentic-${persona}`);
+            activeBtn.classList.add('active', 'bg-accent', 'text-white', 'border-accent');
+            activeBtn.classList.remove('text-primary');
+
+            // Update Transcript
+            const transcript = document.getElementById('agentic-transcript');
+            if (persona === 'neutral') {
+                transcript.innerHTML = `"He steps out, swings hard... it's up in the air! Has he got enough? Yes he has! A spectacular finish to the match, clearing the long-on boundary for a massive six to seal the victory!"`;
+            } else if (persona === 'fanatic') {
+                transcript.innerHTML = `"COME ON! He dances down the track, he's given it the absolute kitchen sink! IT'S HUGE! IT'S INTO THE SECOND TIER! We've done it! What an unbelievable chase, the fortress remains unbreached tonight! Absolute scenes in the stands!"`;
+            } else if (persona === 'tactical') {
+                transcript.innerHTML = `"Anticipating the slower off-cutter, he advances early to negate the spin. Perfect weight transfer, creating a launch angle of 34 degrees. The exit velocity is massive—104 kilometers per hour. That clears the mid-on fielder comfortably for a high-probability maximum to close the game."`;
+            }
+        }
+
+        // --- Journalism Data Logic ---
+        function updateJournalismFilter(filter) {
+             // Update buttons
+             ['all', 'pace', 'spin'].forEach(f => {
+                const btn = document.getElementById(`btn-filter-${f}`);
+                btn.classList.remove('active', 'bg-accent', 'text-white', 'border-accent');
+                if(f !== filter) {
+                    btn.classList.add('bg-white', 'text-primary');
+                }
+            });
+            const activeBtn = document.getElementById(`btn-filter-${filter}`);
+            activeBtn.classList.add('active', 'bg-accent', 'text-white', 'border-accent');
+            activeBtn.classList.remove('bg-white', 'text-primary');
+
+            const insight = document.getElementById('journalism-insight');
+
+            if (filter === 'all') {
+                charts.journalism.data.datasets[0].hidden = false;
+                charts.journalism.data.datasets[1].hidden = false;
+                insight.innerHTML = "Insight: Viewing full match data. Notice the broad spread of scoring opportunities across all lengths. The narrative is complex and noisy.";
+            } else if (filter === 'pace') {
+                charts.journalism.data.datasets[0].hidden = false;
+                charts.journalism.data.datasets[1].hidden = true;
+                insight.innerHTML = "Insight: Filtering for Pace. The visual story reveals that fast bowlers were heavily punished (high Y-axis) when bowling short (X > 7).";
+            } else if (filter === 'spin') {
+                charts.journalism.data.datasets[0].hidden = true;
+                charts.journalism.data.datasets[1].hidden = false;
+                insight.innerHTML = "Insight: Filtering for Spin. A clear cluster shows spinners successfully restricted scoring (low Y-axis) when bowling very full (X < 3).";
+            }
+            charts.journalism.update();
+        }
+
+        // --- Chart Configurations ---
+        function initCharts() {
+            // Global defaults for clean UI
+            Chart.defaults.font.family = "'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'sans-serif'";
+            Chart.defaults.color = '#475569';
+            Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(30, 41, 59, 0.9)';
+            Chart.defaults.plugins.tooltip.padding = 10;
+            Chart.defaults.plugins.tooltip.cornerRadius = 4;
+
+            // 1. Transmedia Bar Chart
+            const ctxTrans = document.getElementById('transmediaChart').getContext('2d');
+            charts.transmedia = new Chart(ctxTrans, {
+                type: 'bar',
+                data: {
+                    labels: transmediaData.labels,
+                    datasets: [{
+                        label: 'Casual Fan Engagement (Hrs)',
+                        data: transmediaData.casual,
+                        backgroundColor: '#c2410c',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+
+            // 2. Spatial Radar Chart
+            const ctxSpatial = document.getElementById('spatialChart').getContext('2d');
+            charts.spatial = new Chart(ctxSpatial, {
+                type: 'radar',
+                data: {
+                    labels: spatialData.labels,
+                    datasets: [
+                        {
+                            label: 'Standard Flat TV',
+                            data: spatialData.flatTV,
+                            backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                            borderColor: '#94a3b8',
+                            pointBackgroundColor: '#94a3b8',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Spatial VR Headset',
+                            data: spatialData.vrSpatial,
+                            backgroundColor: 'rgba(194, 65, 12, 0.2)',
+                            borderColor: '#c2410c',
+                            pointBackgroundColor: '#c2410c',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: { 
+                            angleLines: { color: '#f1f5f9' },
+                            grid: { color: '#f1f5f9' },
+                            pointLabels: { font: { size: 11 } },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // 3. Agentic AI Line Chart
+            const ctxAgentic = document.getElementById('agenticChart').getContext('2d');
+            charts.agentic = new Chart(ctxAgentic, {
+                type: 'line',
+                data: {
+                    labels: agenticData.labels,
+                    datasets: [
+                        {
+                            label: 'Standard Broadcast Emotional Engagement',
+                            data: agenticData.standard,
+                            borderColor: '#cbd5e1',
+                            backgroundColor: '#cbd5e1',
+                            borderWidth: 3,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Personalized AI Persona Engagement',
+                            data: agenticData.personalized,
+                            borderColor: '#c2410c',
+                            backgroundColor: '#c2410c',
+                            borderWidth: 3,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 110,
+                            grid: { color: '#f1f5f9' },
+                            title: { display: true, text: 'Engagement Metric Score' }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) { label += context.parsed.y + ' Index'; }
+                                    // Wrap logic simulation
+                                    return label.length > 50 ? label.match(/.{1,50}/g) : label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 4. Journalism Scatter Plot
+            const ctxJournalism = document.getElementById('journalismChart').getContext('2d');
+            charts.journalism = new Chart(ctxJournalism, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Pace Deliveries (Fast)',
+                            data: journalismBaseData.pace,
+                            backgroundColor: '#ef4444', // Red
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        },
+                        {
+                            label: 'Spin Deliveries (Slow)',
+                            data: journalismBaseData.spin,
+                            backgroundColor: '#3b82f6', // Blue
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'Strike Rate Generated' },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        x: { 
+                            beginAtZero: true, 
+                            max: 10,
+                            title: { display: true, text: 'Pitch Length (0=Yorker, 10=Short)' },
+                            grid: { color: '#e2e8f0' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    return `${context.dataset.label}: Length ${context.parsed.x.toFixed(1)}, SR ${context.parsed.y.toFixed(0)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
