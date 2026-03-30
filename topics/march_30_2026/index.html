@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neurochemistry of Emotion: Stress, Love & Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals (Stone/Sand) with subtle semantic accents (Rose for Love, Amber for Stress, Sky for Balance) -->
+    <!-- Application Structure Plan: The SPA is structured as a guided analytical dashboard. It moves from foundational knowledge (Interactive Hormone Explorer) to complex state analysis (Emotional States Matrix & Radar Chart), and concludes with actionable interventions (Solutions Tabs). This logical flow allows users to understand the 'what', then the 'how', and finally the 'what to do about it', maximizing comprehension of complex neurochemical interactions without needing to read a dense, linear report. -->
+    <!-- Visualization & Content Choices: 
+         1. Interactive Explorer (Goal: Inform): JS-driven info panel replaces text-heavy definitions, allowing focused learning. 
+         2. Radar Chart (Goal: Compare/Relationships): Chart.js Radar used to visualize the "profile" of different emotional states across 5 key hormones simultaneously, highlighting imbalances. 
+         3. Solutions Tabs (Goal: Action/Organize): JS tab interface categorizes solutions, preventing cognitive overload. 
+         Library: Chart.js for data visualization. HTML/CSS for interactive UI. NO SVG or Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 450px;
+            min-height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        html { scroll-behavior: smooth; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased overflow-x-hidden">
+
+    <nav class="fixed top-0 w-full glass-panel border-b border-stone-200 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center font-bold text-xl tracking-tight text-stone-900">
+                    <span class="mr-2">&#129504;</span> NeuroSync
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#explorer" class="text-stone-600 hover:text-sky-600 font-medium transition-colors">The Hormones</a>
+                    <a href="#states" class="text-stone-600 hover:text-sky-600 font-medium transition-colors">Emotional States</a>
+                    <a href="#analysis" class="text-stone-600 hover:text-sky-600 font-medium transition-colors">Balance Analysis</a>
+                    <a href="#solutions" class="text-stone-600 hover:text-emerald-600 font-medium transition-colors">Solutions</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-24 pb-12 sm:pt-32 sm:pb-16 px-4 max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-stone-900 tracking-tight mb-6">
+            The Invisible Architecture of <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-rose-500">Human Emotion</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-stone-600 leading-relaxed mb-8">
+            Stress, anxiety, depression, and love are not just abstract concepts; they are physiological states driven by specific chemical messengers in your body and brain. Explore how these hormones interact, what happens when they fall out of balance, and evidence-based solutions to regain control.
+        </p>
+        <a href="#explorer" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-stone-900 hover:bg-stone-800 transition-colors">
+            Begin Exploration &#8595;
+        </a>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-24">
+
+        <section id="explorer" class="scroll-mt-24">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">The Chemical Messengers</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    This section serves as your foundational glossary. Before understanding complex emotional states, you must identify the primary actors. Click on each hormone below to reveal its specific role, origin, and physiological impact on the human body.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div class="md:col-span-4 flex flex-col space-y-2" id="hormone-buttons">
+                </div>
+
+                <div class="md:col-span-8 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-stone-200 flex flex-col justify-center min-h-[300px]">
+                    <div id="hormone-display" class="fade-in">
+                        <div class="text-center text-stone-400 py-12">
+                            <span class="text-4xl block mb-4">&#128072;</span>
+                            <p>Select a hormone from the menu to view its profile.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="states" class="scroll-mt-24 bg-stone-100 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-16 rounded-3xl">
+            <div class="mb-10 max-w-3xl">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Anatomy of Emotional States</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    Emotions are rarely caused by a single hormone; they are cocktails. This matrix breaks down the four primary physiological states discussed in the report, highlighting which chemicals are surging and which are depleted during these experiences.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border-l-4 border-amber-500 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Stress & Anxiety</h3>
+                        <span class="text-2xl">&#9888;&#65039;</span>
+                    </div>
+                    <p class="text-stone-600 text-sm mb-4">An evolutionary survival mechanism that goes into overdrive in modern environments.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex justify-between items-center"><span class="font-medium">Cortisol</span> <span class="text-amber-600 font-bold">&#8593; Chronically High</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Adrenaline</span> <span class="text-amber-600 font-bold">&#8593; Spiking</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Serotonin</span> <span class="text-stone-400 font-bold">&#8595; Suppressed</span></li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-stone-100 text-sm text-stone-500">
+                        <strong>Impact:</strong> Increased heart rate, hyper-vigilance, digestive issues, sleep disruption.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border-l-4 border-indigo-500 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Depression</h3>
+                        <span class="text-2xl">&#127783;&#65039;</span>
+                    </div>
+                    <p class="text-stone-600 text-sm mb-4">A complex state of neurological depletion, often following prolonged chronic stress.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex justify-between items-center"><span class="font-medium">Serotonin</span> <span class="text-indigo-600 font-bold">&#8595; Severely Low</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Dopamine</span> <span class="text-indigo-600 font-bold">&#8595; Low</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Cortisol</span> <span class="text-amber-600 font-bold">&#8597; Dysregulated</span></li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-stone-100 text-sm text-stone-500">
+                        <strong>Impact:</strong> Lethargy, lack of motivation (anhedonia), disrupted sleep architecture, cognitive fog.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border-l-4 border-rose-500 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Love & Attachment</h3>
+                        <span class="text-2xl">&#10084;&#65039;</span>
+                    </div>
+                    <p class="text-stone-600 text-sm mb-4">A powerful physiological state designed to promote pair-bonding and social survival.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex justify-between items-center"><span class="font-medium">Oxytocin</span> <span class="text-rose-600 font-bold">&#8593; Very High</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Dopamine</span> <span class="text-rose-600 font-bold">&#8593; High</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Cortisol</span> <span class="text-sky-600 font-bold">&#8595; Lowered</span></li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-stone-100 text-sm text-stone-500">
+                        <strong>Impact:</strong> Feelings of safety, reduced pain perception, intense focus on partner, stress buffering.
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border-l-4 border-sky-500 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-stone-900">Optimal Balance</h3>
+                        <span class="text-2xl">&#9878;&#65039;</span>
+                    </div>
+                    <p class="text-stone-600 text-sm mb-4">Homeostasis. The body is responsive to challenges but quickly returns to baseline.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex justify-between items-center"><span class="font-medium">Serotonin</span> <span class="text-sky-600 font-bold">&#10003; Stable</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Dopamine</span> <span class="text-sky-600 font-bold">&#10003; Regulated</span></li>
+                        <li class="flex justify-between items-center"><span class="font-medium">Cortisol</span> <span class="text-sky-600 font-bold">&#8634; Normal Rhythm</span></li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-stone-100 text-sm text-stone-500">
+                        <strong>Impact:</strong> Emotional resilience, steady energy, clear cognition, healthy sleep-wake cycle.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analysis" class="scroll-mt-24">
+            <div class="mb-8 max-w-3xl">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Quantitative Balance Analysis</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    Visualizing emotional states helps comprehend the magnitude of chemical shifts. Use the toggles below to see how the relative levels of key neurotransmitters and hormones change across different psychological profiles.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-stone-200">
+                <div class="flex flex-wrap justify-center gap-3 mb-8" id="chart-controls">
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                
+                <div class="mt-8 text-center bg-stone-50 p-4 rounded-xl text-sm text-stone-600" id="chart-insight">
+                    Select a state above to view insights.
+                </div>
+            </div>
+        </section>
+
+        <section id="solutions" class="scroll-mt-24">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Protocols for Homeostasis</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    Neurochemistry is not fixed; it is highly responsive to environment, behavior, and input. This section categorizes evidence-based solutions from the source report into actionable protocols to help regulate cortisol, boost serotonin/dopamine, and foster oxytocin.
+                </p>
+            </div>
+
+            <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm">
+                <div class="flex border-b border-stone-200 overflow-x-auto" id="solution-tabs">
+                </div>
+                <div class="p-6 sm:p-8" id="solution-content">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-12 text-center">
+        <div class="max-w-6xl mx-auto px-4">
+            <p class="mb-2">&#129504; NeuroSync Interactive Dashboard</p>
+            <p class="text-sm">Synthesized from research on endocrinology and behavioral psychology.</p>
+        </div>
+    </footer>
+
+    <script>
+        const hormones = {
+            cortisol: {
+                id: 'cortisol',
+                name: 'Cortisol',
+                emoji: '&#9888;&#65039;',
+                tag: 'The Stress Hormone',
+                color: 'amber',
+                source: 'Adrenal glands (top of kidneys)',
+                mechanism: 'Released in response to stress and low blood-glucose concentration. It triggers the fight-or-flight response, prioritizing immediate energy over long-term functions.',
+                impact: 'Increases heart rate, blood pressure, and respiration. Suppresses the digestive system, reproductive system, and immune system to redirect energy.',
+                imbalance: 'Chronic high levels lead to persistent anxiety, weight gain, sleep disruption, and eventually contribute to depressive states due to neurotoxic effects on the hippocampus.'
+            },
+            serotonin: {
+                id: 'serotonin',
+                name: 'Serotonin',
+                emoji: '&#9878;&#65039;',
+                tag: 'The Mood Stabilizer',
+                color: 'sky',
+                source: 'Enteric nervous system (Gut, ~90%) and Brainstem',
+                mechanism: 'A neurotransmitter that facilitates communication between brain cells and nervous system cells. Crucial for regulating mood, sleep patterns, and digestion.',
+                impact: 'Creates feelings of well-being, calmness, and emotional stability. Regulates the sleep-wake cycle (precursor to melatonin).',
+                imbalance: 'Low levels are heavily linked to depression, anxiety disorders, obsessive thinking, and disrupted sleep.'
+            },
+            dopamine: {
+                id: 'dopamine',
+                name: 'Dopamine',
+                emoji: '&#127919;',
+                tag: 'The Reward Chemical',
+                color: 'violet',
+                source: 'Substantia nigra and ventral tegmental area (Brain)',
+                mechanism: 'Operates the brain\'s reward and pleasure centers. It is released when we expect or receive a reward, driving motivation and learning.',
+                impact: 'Provides the drive to achieve goals, focus, and experience pleasure. High levels are present in the early, exciting stages of love and attraction.',
+                imbalance: 'Low dopamine results in anhedonia (inability to feel pleasure), lack of motivation, and is a core component of clinical depression.'
+            },
+            oxytocin: {
+                id: 'oxytocin',
+                name: 'Oxytocin',
+                emoji: '&#10084;&#65039;',
+                tag: 'The Bonding Hormone',
+                color: 'rose',
+                source: 'Hypothalamus (released by pituitary gland)',
+                mechanism: 'Released during physical touch, social bonding, and childbirth. It acts as a neuromodulator in the brain to shape social behaviors.',
+                impact: 'Promotes trust, empathy, and pair-bonding. Crucially, oxytocin acts as a buffer against stress by actively lowering cortisol levels and blood pressure.',
+                imbalance: 'Lack of oxytocin (often due to social isolation) increases susceptibility to stress, anxiety, and feelings of disconnection.'
+            },
+            adrenaline: {
+                id: 'adrenaline',
+                name: 'Adrenaline (Epinephrine)',
+                emoji: '&#9889;',
+                tag: 'The Action Trigger',
+                color: 'orange',
+                source: 'Adrenal medulla',
+                mechanism: 'The immediate, short-term responder to sudden stress or threat. Works alongside cortisol but acts much faster.',
+                impact: 'Massive surge in energy, dilated pupils, expanded air passages in the lungs. Sharpens immediate focus to deal with threats.',
+                imbalance: 'Constant triggers lead to physical exhaustion, heart palpitations, and severe acute anxiety or panic attacks.'
+            }
+        };
+
+        const initHormoneExplorer = () => {
+            const btnContainer = document.getElementById('hormone-buttons');
+            const display = document.getElementById('hormone-display');
+            
+            const colorMap = {
+                'amber': 'border-amber-500 text-amber-700 bg-amber-50 hover:bg-amber-100',
+                'sky': 'border-sky-500 text-sky-700 bg-sky-50 hover:bg-sky-100',
+                'violet': 'border-violet-500 text-violet-700 bg-violet-50 hover:bg-violet-100',
+                'rose': 'border-rose-500 text-rose-700 bg-rose-50 hover:bg-rose-100',
+                'orange': 'border-orange-500 text-orange-700 bg-orange-50 hover:bg-orange-100',
+            };
+
+            const headerColorMap = {
+                'amber': 'text-amber-600',
+                'sky': 'text-sky-600',
+                'violet': 'text-violet-600',
+                'rose': 'text-rose-600',
+                'orange': 'text-orange-600',
+            }
+
+            let activeBtn = null;
+
+            Object.values(hormones).forEach(h => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-5 py-4 rounded-xl border-2 border-stone-200 bg-white hover:border-stone-300 font-medium transition-all duration-200 flex items-center justify-between shadow-sm`;
+                btn.innerHTML = `<span>${h.emoji} ${h.name}</span> <span class="text-xs text-stone-400 font-normal hidden sm:inline-block">${h.tag}</span>`;
+                
+                btn.onclick = () => {
+                    if(activeBtn) {
+                        activeBtn.className = `w-full text-left px-5 py-4 rounded-xl border-2 border-stone-200 bg-white hover:border-stone-300 font-medium transition-all duration-200 flex items-center justify-between shadow-sm`;
+                    }
+                    btn.className = `w-full text-left px-5 py-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between shadow-sm ${colorMap[h.color]}`;
+                    activeBtn = btn;
+
+                    display.innerHTML = `
+                        <div class="fade-in">
+                            <div class="flex items-center mb-2">
+                                <span class="text-3xl mr-3">${h.emoji}</span>
+                                <div>
+                                    <h3 class="text-2xl font-bold ${headerColorMap[h.color]}">${h.name}</h3>
+                                    <span class="text-sm font-medium text-stone-500 uppercase tracking-wider">${h.tag}</span>
+                                </div>
+                            </div>
+                            <div class="mt-6 space-y-4">
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-900 uppercase tracking-wider mb-1">Source</h4>
+                                    <p class="text-stone-700 bg-stone-50 p-3 rounded-lg border border-stone-100">${h.source}</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-900 uppercase tracking-wider mb-1">Mechanism</h4>
+                                    <p class="text-stone-700 leading-relaxed">${h.mechanism}</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-900 uppercase tracking-wider mb-1">Physiological Impact</h4>
+                                    <p class="text-stone-700 leading-relaxed">${h.impact}</p>
+                                </div>
+                                <div class="bg-red-50 p-4 rounded-lg border border-red-100 mt-4">
+                                    <h4 class="text-sm font-bold text-red-800 uppercase tracking-wider mb-1">Dangers of Imbalance</h4>
+                                    <p class="text-red-700 text-sm leading-relaxed">${h.imbalance}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+                btnContainer.appendChild(btn);
+            });
+        };
+
+        const initChart = () => {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const stateData = {
+                balance: { label: 'Optimal Balance', data: [50, 40, 70, 60, 60], color: '14, 165, 233', insight: 'In a balanced state, cortisol and adrenaline are present but low, ready to react. Serotonin and oxytocin provide a stable, calm baseline, while dopamine offers steady motivation.' },
+                stress: { label: 'Chronic Stress', data: [90, 85, 30, 40, 20], color: '245, 158, 11', insight: 'Chronic stress shows severely elevated Cortisol and Adrenaline. This constant activation suppresses Serotonin (ruining sleep/mood) and blocks Oxytocin release.' },
+                depression: { label: 'Depression', data: [75, 30, 15, 20, 30], color: '99, 102, 241', insight: 'Characterized by a devastating drop in Serotonin and Dopamine. Cortisol often remains dysregulated (high at wrong times), contributing to lethargy and anhedonia.' },
+                love: { label: 'Love / Bonding', data: [20, 50, 85, 95, 100], color: '225, 29, 72', insight: 'A massive surge in Oxytocin and Dopamine creates intense bonding and reward feelings. Notice how high Oxytocin actively suppresses Cortisol, reducing overall stress.' }
+            };
+
+            let currentChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Cortisol (Stress)', 'Adrenaline (Alertness)', 'Serotonin (Mood)', 'Dopamine (Reward)', 'Oxytocin (Bonding)'],
+                    datasets: [{
+                        label: stateData.balance.label,
+                        data: stateData.balance.data,
+                        backgroundColor: `rgba(${stateData.balance.color}, 0.2)`,
+                        borderColor: `rgba(${stateData.balance.color}, 1)`,
+                        pointBackgroundColor: `rgba(${stateData.balance.color}, 1)`,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: `rgba(${stateData.balance.color}, 1)`,
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            pointLabels: {
+                                font: { size: window.innerWidth < 640 ? 10 : 12, family: 'Inter, sans-serif' },
+                                color: '#44403C'
+                            },
+                            ticks: { display: false, min: 0, max: 100 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(28, 25, 23, 0.9)',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Relative Level: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const controlsContainer = document.getElementById('chart-controls');
+            const insightBox = document.getElementById('chart-insight');
+            let activeControl = null;
+
+            insightBox.innerHTML = `<strong>Insight:</strong> ${stateData['balance'].insight}`;
+
+            Object.keys(stateData).forEach(key => {
+                const btn = document.createElement('button');
+                const isFirst = key === 'balance';
+                btn.className = `px-4 py-2 rounded-full text-sm font-medium transition-colors border ${isFirst ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-600 border-stone-300 hover:bg-stone-50'}`;
+                btn.innerText = stateData[key].label;
+                
+                if(isFirst) activeControl = btn;
+
+                btn.onclick = () => {
+                    if(activeControl) {
+                        activeControl.className = `px-4 py-2 rounded-full text-sm font-medium transition-colors border bg-white text-stone-600 border-stone-300 hover:bg-stone-50`;
+                    }
+                    btn.className = `px-4 py-2 rounded-full text-sm font-medium transition-colors border bg-stone-800 text-white border-stone-800`;
+                    activeControl = btn;
+
+                    // Update Chart
+                    currentChart.data.datasets[0].label = stateData[key].label;
+                    currentChart.data.datasets[0].data = stateData[key].data;
+                    currentChart.data.datasets[0].backgroundColor = `rgba(${stateData[key].color}, 0.2)`;
+                    currentChart.data.datasets[0].borderColor = `rgba(${stateData[key].color}, 1)`;
+                    currentChart.data.datasets[0].pointBackgroundColor = `rgba(${stateData[key].color}, 1)`;
+                    currentChart.update();
+
+                    // Update Insight
+                    insightBox.innerHTML = `<strong class="text-stone-900">Insight:</strong> <span class="fade-in inline-block">${stateData[key].insight}</span>`;
+                };
+                controlsContainer.appendChild(btn);
+            });
+        };
+
+        const solutions = {
+            physical: {
+                title: "Physical & Physiological",
+                icon: "&#127939;",
+                items: [
+                    { name: "Aerobic Exercise", impact: "Boosts Endorphins & Serotonin. Metabolizes excess Cortisol.", desc: "30 mins of moderate cardio helps 'burn off' stress hormones circulating in the bloodstream while triggering mood-boosting endorphins." },
+                    { name: "Sleep Hygiene Optimization", impact: "Restores baseline Cortisol rhythm.", desc: "Consistent sleep/wake times and dark environments regulate melatonin, which in turn helps reset the morning cortisol spike to normal levels." },
+                    { name: "Deep Diaphragmatic Breathing", impact: "Lowers Adrenaline instantly.", desc: "Slow, deep belly breathing stimulates the Vagus nerve, physically forcing the nervous system out of fight-or-flight into rest-and-digest." }
+                ]
+            },
+            nutritional: {
+                title: "Dietary Interventions",
+                icon: "&#127823;",
+                items: [
+                    { name: "Gut-Brain Axis Support", impact: "Increases Serotonin production.", desc: "Since ~90% of serotonin is made in the gut, a diet rich in fiber, probiotics (yogurt, kimchi), and prebiotics supports the microbiome responsible for production." },
+                    { name: "Omega-3 Fatty Acids", impact: "Reduces neuro-inflammation.", desc: "Found in fish and flaxseeds, these fats protect neural pathways and are statistically linked to lower rates of clinical depression." },
+                    { name: "Caffeine Regulation", impact: "Prevents artificial Cortisol spikes.", desc: "Limiting caffeine, especially in the afternoon, prevents the artificial triggering of adrenaline and cortisol, aiding anxiety management." }
+                ]
+            },
+            psychosocial: {
+                title: "Social & Psychological",
+                icon: "&#129309;",
+                items: [
+                    { name: "Intentional Social Connection", impact: "Releases Oxytocin.", desc: "Meaningful conversations, physical touch (hugging), and spending time with loved ones triggers oxytocin, which acts as a direct antidote to cortisol." },
+                    { name: "Mindfulness & Meditation", impact: "Re-wires Dopamine & Lowers Cortisol.", desc: "Regular practice decreases activity in the amygdala (fear center) and increases baseline dopamine levels, improving focus and calm." },
+                    { name: "Professional Therapy (CBT)", impact: "Cognitive restructuring.", desc: "Therapy helps identify mental patterns that chronically trigger stress hormones, teaching the brain to interpret stimuli differently." }
+                ]
+            }
+        };
+
+        const initSolutions = () => {
+            const tabsContainer = document.getElementById('solution-tabs');
+            const contentContainer = document.getElementById('solution-content');
+            let activeTabBtn = null;
+
+            Object.keys(solutions).forEach((key, index) => {
+                const s = solutions[key];
+                const btn = document.createElement('button');
+                const isFirst = index === 0;
+                
+                btn.className = `flex-1 py-4 px-6 text-sm font-bold text-center border-b-2 transition-colors whitespace-nowrap ${isFirst ? 'border-emerald-500 text-emerald-700 bg-emerald-50/50' : 'border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50'}`;
+                btn.innerHTML = `<span class="mr-2">${s.icon}</span> ${s.title}`;
+                
+                if(isFirst) activeTabBtn = btn;
+
+                btn.onclick = () => {
+                    if(activeTabBtn) {
+                        activeTabBtn.className = `flex-1 py-4 px-6 text-sm font-bold text-center border-b-2 transition-colors whitespace-nowrap border-transparent text-stone-500 hover:text-stone-700 hover:bg-stone-50`;
+                    }
+                    btn.className = `flex-1 py-4 px-6 text-sm font-bold text-center border-b-2 transition-colors whitespace-nowrap border-emerald-500 text-emerald-700 bg-emerald-50/50`;
+                    activeTabBtn = btn;
+                    renderSolutionContent(s);
+                };
+                tabsContainer.appendChild(btn);
+
+                if(isFirst) renderSolutionContent(s);
+            });
+
+            function renderSolutionContent(data) {
+                let html = `<div class="fade-in space-y-6">`;
+                data.items.forEach(item => {
+                    html += `
+                        <div class="p-5 rounded-xl border border-stone-100 bg-stone-50 hover:bg-white transition-colors">
+                            <h4 class="text-lg font-bold text-stone-900 mb-1">${item.name}</h4>
+                            <p class="text-emerald-600 font-medium text-sm mb-3">Mechanism: ${item.impact}</p>
+                            <p class="text-stone-600 text-sm leading-relaxed">${item.desc}</p>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                contentContainer.innerHTML = html;
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initHormoneExplorer();
+            initChart();
+            initSolutions();
+
+            // Auto-click first hormone to populate view
+            const firstBtn = document.querySelector('#hormone-buttons button');
+            if(firstBtn) firstBtn.click();
+        });
+    </script>
+</body>
+</html>
