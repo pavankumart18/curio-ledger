@@ -327,6 +327,10 @@
         .card-dots--emotion i:nth-child(2) { background: #fb7185; }
         .card-dots--emotion i:nth-child(3) { background: #f59e0b; border: 1px solid rgba(0,0,0,0.2); }
 
+        .card-dots--arch i:nth-child(1) { background: #0984e3; }
+        .card-dots--arch i:nth-child(2) { background: #00b894; }
+        .card-dots--arch i:nth-child(3) { background: #fdcb6e; border: 1px solid rgba(0,0,0,0.2); }
+
         .card-dots--yc i:nth-child(1) { background: #f26522; }
         .card-dots--yc i:nth-child(2) { background: #111111; }
         .card-dots--yc i:nth-child(3) { background: #fdfbf7; border: 1px solid rgba(0,0,0,0.2); }
@@ -428,6 +432,37 @@
             </div>
 
             <div class="grid">
+                <a class="card" href="topics/march_31_2026/index.html" style="--delay: 0s">
+                    <div class="card-visual">
+                        <img
+                            class="card-image"
+                            src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&amp;fit=crop&amp;w=1200&amp;q=80"
+                            srcset="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&amp;fit=crop&amp;w=640&amp;q=80 640w,
+                                    https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&amp;fit=crop&amp;w=1200&amp;q=80 1200w"
+                            sizes="(max-width: 480px) 100vw, (max-width: 900px) 50vw, 400px"
+                            width="1200"
+                            height="750"
+                            alt="Abstract network visualization representing next-generation AI architectures beyond transformers."
+                            loading="eager"
+                            decoding="async"
+                        >
+                        <div class="card-visual-scrim" aria-hidden="true"></div>
+                        <div class="card-dots card-dots--arch" aria-hidden="true">
+                            <i></i><i></i><i></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-meta">March 31, 2026 · AI architectures</p>
+                        <h2 class="card-title">Beyond the Transformer</h2>
+                        <p class="card-lede">A guided map of next-gen model designs—MoE, SSMs, LNNs, and the scaling trade-offs that may define the post-transformer era.</p>
+                        <span class="card-cta">
+                            Open data story
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
+                    </div>
+                </a>
                 <a class="card" href="topics/march_30_2026/index.html" style="--delay: 0s">
                     <div class="card-visual">
                         <img
@@ -439,7 +474,7 @@
                             width="1200"
                             height="750"
                             alt="Brain imagery representing neurochemistry behind human emotions like stress and love."
-                            loading="eager"
+                            loading="lazy"
                             decoding="async"
                         >
                         <div class="card-visual-scrim" aria-hidden="true"></div>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next-Gen AI Architectures: Beyond the Transformer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config for Custom Colors/Fonts -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-bg': '#FDFBF7',
+                        'brand-text': '#2D3436',
+                        'brand-muted': '#636E72',
+                        'arch-transformer': '#0984E3',
+                        'arch-moe': '#00B894',
+                        'arch-ssm': '#FDCB6E',
+                        'arch-lnn': '#D63031',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Essential Custom CSS for Chart Containers and Interactions -->
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #2D3436;
+        }
+        
+        /* Chart Container Strict Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 60vh;
+            max-height: 450px;
+            min-height: 300px;
+        }
+
+        .radar-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 50vh;
+            max-height: 500px;
+            min-height: 350px;
+        }
+
+        /* Interactive Tab Styling */
+        .tab-btn.active {
+            border-bottom: 3px solid;
+            font-weight: 600;
+            background-color: rgba(0,0,0,0.03);
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        /* CSS-based structural diagrams (No SVG) */
+        .node {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .block-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .layer {
+            width: 80%;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-weight: 500;
+            color: white;
+        }
+    </style>
+</head>
+
+<!-- Chosen Palette: Warm Neutrals with Vibrant Architectural Accents (Brand BG: #FDFBF7, Transformer: Blue, MoE: Green, SSM: Yellow, LNN: Red) -->
+<!-- Application Structure Plan: 
+    1. Hero: Introduces the core premise (the evolution beyond standard Transformers).
+    2. The Paradigm Shift (Context): Explains the "why" using an interactive line chart showing the context-length bottleneck that forced new architectures.
+    3. Architecture Deep Dive (Interactive Explorer): The core interactive element. Uses tabs to switch between 4 key architectures. Each tab displays qualitative insights, a CSS-based conceptual diagram (NO SVG), and pros/cons, allowing users to compare models logically without overwhelming them with text at once.
+    4. Performance Showdown: A comparative radar chart to quantitatively assess how these architectures stack up against each other across key metrics (Efficiency, Context, Memory, Speed).
+-->
+<!-- Visualization & Content Choices: 
+    - Goal: Show the evolution of context windows driving architectural change -> Viz: Line Chart (Chart.js) -> Interaction: Hover tooltips to see exact numbers -> Justification: Clearly illustrates the quadratic bottleneck problem of early transformers versus newer models.
+    - Goal: Explain complex architectures individually -> Viz: Tabbed Interface with CSS-based diagrams -> Interaction: Click tabs to reveal specific architecture details -> Justification: Chunks information, prevents cognitive overload, allows self-paced exploration. No SVG used, relying on HTML/Tailwind for visual structure.
+    - Goal: Compare overall viability -> Viz: Radar Chart (Chart.js) -> Interaction: Hover to see metric scores -> Justification: Best for multi-variable comparative analysis across categorical models.
+-->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-brand-bg/90 backdrop-blur-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 font-serif font-bold text-xl text-brand-text">
+                    AI<span class="text-arch-transformer">Arch</span>Tracker
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#overview" class="text-brand-muted hover:text-brand-text px-3 py-2 rounded-md text-sm font-medium transition-colors">The Shift</a>
+                    <a href="#architectures" class="text-brand-muted hover:text-brand-text px-3 py-2 rounded-md text-sm font-medium transition-colors">Deep Dive</a>
+                    <a href="#comparison" class="text-brand-muted hover:text-brand-text px-3 py-2 rounded-md text-sm font-medium transition-colors">Showdown</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="py-20 lg:py-32 overflow-hidden relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold tracking-wide uppercase mb-6 shadow-sm">
+                State of the Art Report 2026
+            </div>
+            <h1 class="text-5xl md:text-7xl font-serif font-extrabold tracking-tight text-brand-text mb-6">
+                Beyond the <span class="text-arch-transformer relative inline-block">Transformer
+                    <span class="absolute bottom-0 left-0 w-full h-2 bg-arch-transformer opacity-20"></span>
+                </span>
+            </h1>
+            <p class="mt-4 max-w-2xl text-xl text-brand-muted mx-auto mb-10">
+                An interactive exploration of the new neural architectures reshaping artificial intelligence. Discover how MoE, SSMs, and Liquid Networks are solving the compute and memory bottlenecks of traditional AI.
+            </p>
+            <a href="#overview" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-brand-text hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl">
+                Explore the Data &rarr;
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Section 1: The Paradigm Shift -->
+        <section id="overview" class="py-16 bg-white border-y border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-serif font-bold text-brand-text mb-4">The Context Window Bottleneck</h2>
+                    <p class="max-w-3xl mx-auto text-brand-muted text-lg">
+                        This section explores the fundamental limitation driving architectural innovation. Standard Transformers suffer from quadratic computational complexity—as the input length doubles, the compute cost quadruples. The chart below illustrates how newer architectures have shattered the context window ceiling.
+                    </p>
+                </div>
+
+                <div class="bg-brand-bg rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold text-brand-text mb-2">Evolution of Effective Context Lengths (Tokens)</h3>
+                    <p class="text-sm text-brand-muted mb-6">Logarithmic scale demonstrating the explosive growth in context handling capabilities over time.</p>
+                    
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <canvas id="contextChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Architecture Deep Dive -->
+        <section id="architectures" class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-12">
+                    <h2 class="text-3xl font-serif font-bold text-brand-text mb-4">Architectural Deep Dive</h2>
+                    <p class="max-w-3xl text-brand-muted text-lg">
+                        Explore the structural differences, key mechanisms, and trade-offs of the leading AI architectures. Select an architecture below to update the interactive dossier and understand its unique approach to processing information.
+                    </p>
+                </div>
+
+                <!-- Interactive Tabs -->
+                <div class="flex flex-wrap border-b border-gray-300 mb-8" id="arch-tabs">
+                    <button class="tab-btn active px-6 py-4 text-lg font-medium text-brand-text border-arch-transformer hover:bg-gray-50 focus:outline-none" data-target="transformer" style="border-bottom-color: #0984E3;">
+                        Transformers
+                    </button>
+                    <button class="tab-btn px-6 py-4 text-lg font-medium text-brand-muted hover:text-brand-text hover:bg-gray-50 focus:outline-none" data-target="moe">
+                        Mixture of Experts
+                    </button>
+                    <button class="tab-btn px-6 py-4 text-lg font-medium text-brand-muted hover:text-brand-text hover:bg-gray-50 focus:outline-none" data-target="ssm">
+                        State Space (Mamba)
+                    </button>
+                    <button class="tab-btn px-6 py-4 text-lg font-medium text-brand-muted hover:text-brand-text hover:bg-gray-50 focus:outline-none" data-target="lnn">
+                        Liquid Networks
+                    </button>
+                </div>
+
+                <!-- Dynamic Content Area -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 min-h-[400px]">
+                    
+                    <!-- Text Details Column -->
+                    <div class="lg:col-span-2 space-y-6 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transition-opacity duration-300" id="content-pane">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span id="arch-badge" class="px-3 py-1 rounded-full text-xs font-bold text-white bg-arch-transformer uppercase tracking-wider">Baseline</span>
+                            <h3 id="arch-title" class="text-3xl font-bold text-brand-text">The Transformer</h3>
+                        </div>
+                        
+                        <p id="arch-desc" class="text-lg text-brand-muted leading-relaxed">
+                            The architecture that started the modern AI revolution. It relies heavily on the self-attention mechanism, allowing every token in a sequence to look at every other token to gather context.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                            <div class="bg-green-50 p-5 rounded-xl border border-green-100">
+                                <h4 class="font-bold text-green-800 flex items-center gap-2 mb-3">
+                                    <span class="text-xl">&#10003;</span> Core Strengths
+                                </h4>
+                                <ul id="arch-pros" class="space-y-2 text-sm text-green-700">
+                                    <li>&bull; Highly parallelizable training</li>
+                                    <li>&bull; Excellent at capturing global context</li>
+                                    <li>&bull; Massive ecosystem and optimization</li>
+                                </ul>
+                            </div>
+                            <div class="bg-red-50 p-5 rounded-xl border border-red-100">
+                                <h4 class="font-bold text-red-800 flex items-center gap-2 mb-3">
+                                    <span class="text-xl">&#10007;</span> Key Limitations
+                                </h4>
+                                <ul id="arch-cons" class="space-y-2 text-sm text-red-700">
+                                    <li>&bull; O(N&sup2;) quadratic compute cost</li>
+                                    <li>&bull; High memory usage during inference (KV Cache)</li>
+                                    <li>&bull; Struggles with infinite context streaming</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conceptual Diagram Column (CSS based, NO SVG) -->
+                    <div class="bg-gray-50 p-8 rounded-2xl flex flex-col items-center justify-center border border-gray-200">
+                        <h4 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-8">Conceptual Structure</h4>
+                        
+                        <div id="diagram-container" class="w-full h-full flex items-center justify-center min-h-[250px]">
+                            <!-- Default Transformer Diagram -->
+                            <div class="block-diagram w-full relative">
+                                <div class="layer bg-gray-300 text-gray-700 text-xs">Input Tokens</div>
+                                <div class="h-6 w-0.5 bg-gray-400"></div>
+                                <div class="layer bg-arch-transformer p-4 flex flex-col gap-2">
+                                    <div class="bg-white/20 rounded p-1 text-xs">Multi-Head Attention</div>
+                                    <div class="bg-white/20 rounded p-1 text-xs">Feed Forward Network</div>
+                                </div>
+                                <div class="h-6 w-0.5 bg-gray-400"></div>
+                                <div class="layer bg-arch-transformer p-4 flex flex-col gap-2">
+                                    <div class="bg-white/20 rounded p-1 text-xs">Multi-Head Attention</div>
+                                    <div class="bg-white/20 rounded p-1 text-xs">Feed Forward Network</div>
+                                </div>
+                                <div class="h-6 w-0.5 bg-gray-400"></div>
+                                <div class="layer bg-gray-300 text-gray-700 text-xs">Output</div>
+                                
+                                <!-- Decorative attention lines -->
+                                <div class="absolute left-1/4 top-1/4 h-1/2 w-px border-l-2 border-dashed border-white/40 z-10"></div>
+                                <div class="absolute right-1/4 top-1/4 h-1/2 w-px border-l-2 border-dashed border-white/40 z-10"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Performance Showdown -->
+        <section id="comparison" class="py-16 bg-white border-t border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-serif font-bold text-brand-text mb-4">Performance Showdown</h2>
+                    <p class="max-w-3xl mx-auto text-brand-muted text-lg">
+                        This radar analysis compares the architectures across four critical dimensions. No single model wins everywhere; selection depends on the specific use case, highlighting the shift from "one size fits all" to purpose-built AI.
+                    </p>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-8 items-center justify-center bg-brand-bg p-8 rounded-2xl shadow-inner border border-gray-200">
+                    
+                    <div class="w-full md:w-1/2">
+                        <div class="radar-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-1/2 space-y-6">
+                        <h3 class="text-2xl font-bold text-brand-text">Metric Definitions</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-800 font-bold shrink-0">1</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Compute Efficiency (Training)</h4>
+                                    <p class="text-sm text-gray-600">How effectively the model scales parameters without requiring exponential processing power (MoE excels here).</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded bg-green-100 flex items-center justify-center text-green-800 font-bold shrink-0">2</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Inference Speed & Latency</h4>
+                                    <p class="text-sm text-gray-600">Speed of generating tokens. Linear models (Mamba, LNN) avoid the KV-cache bottleneck of Transformers.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded bg-yellow-100 flex items-center justify-center text-yellow-800 font-bold shrink-0">3</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Context Window Length</h4>
+                                    <p class="text-sm text-gray-600">Ability to recall information from long documents. SSMs theoretically offer near-infinite context.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 rounded bg-red-100 flex items-center justify-center text-red-800 font-bold shrink-0">4</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Edge/Real-time Adaptability</h4>
+                                    <p class="text-sm text-gray-600">Ability to run on small devices and adapt continuously to streaming data (Liquid Networks dominate).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2026 AI Architecture Intelligence Report. Synthesized for interactive exploration.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 1. Data Store for Interactive Tabs ---
+            const architectureData = {
+                transformer: {
+                    title: "The Transformer",
+                    badge: "Baseline standard",
+                    color: "#0984E3",
+                    desc: "The architecture that started the modern AI revolution. It relies on the 'self-attention' mechanism, allowing every token in a sequence to look at every other token to gather context. While incredibly powerful at capturing relationships, its math scales quadratically, making long documents computationally explosive.",
+                    pros: [
+                        "Highly parallelizable training",
+                        "Excellent at capturing global context",
+                        "Massive ecosystem and optimization tooling"
+                    ],
+                    cons: [
+                        "O(N²) quadratic compute cost for context",
+                        "High memory usage during inference (KV Cache)",
+                        "Struggles with infinite/streaming context"
+                    ],
+                    diagramHTML: `
+                        <div class="block-diagram w-full relative">
+                            <div class="layer bg-gray-300 text-gray-700 text-xs shadow-sm">Input Tokens</div>
+                            <div class="h-6 w-0.5 bg-gray-400"></div>
+                            <div class="layer bg-arch-transformer p-4 flex flex-col gap-2 shadow-md">
+                                <div class="bg-white/20 rounded p-1 text-xs">Self-Attention (All-to-All)</div>
+                                <div class="bg-white/20 rounded p-1 text-xs">Feed Forward Network</div>
+                            </div>
+                            <div class="h-6 w-0.5 bg-gray-400"></div>
+                            <div class="layer bg-arch-transformer p-4 flex flex-col gap-2 shadow-md">
+                                <div class="bg-white/20 rounded p-1 text-xs">Self-Attention (All-to-All)</div>
+                                <div class="bg-white/20 rounded p-1 text-xs">Feed Forward Network</div>
+                            </div>
+                            <div class="h-6 w-0.5 bg-gray-400"></div>
+                            <div class="layer bg-gray-300 text-gray-700 text-xs shadow-sm">Output generation</div>
+                        </div>
+                    `
+                },
+                moe: {
+                    title: "Mixture of Experts (MoE)",
+                    badge: "Scaling champion",
+                    color: "#00B894",
+                    desc: "MoE tackles the problem of scaling model parameters without proportionally increasing compute costs. Instead of activating the entire network for every word, a 'Router' sends the input only to highly specialized sub-networks (Experts). A 70-billion parameter model might only use 12 billion parameters for any given token.",
+                    pros: [
+                        "Massive parameter scaling with lower compute",
+                        "Faster inference compared to dense models of same size",
+                        "Specialization allows nuanced knowledge separation"
+                    ],
+                    cons: [
+                        "High VRAM requirements (all experts must fit in memory)",
+                        "Complex load balancing during training",
+                        "Router bottleneck issues"
+                    ],
+                    diagramHTML: `
+                        <div class="flex flex-col items-center w-full">
+                            <div class="layer bg-gray-300 text-gray-700 text-xs shadow-sm w-1/2 mb-4">Input Token</div>
+                            <div class="w-full border-t-2 border-gray-400 border-dashed mb-4 relative flex justify-center">
+                                <div class="absolute -top-3 bg-gray-700 text-white text-[10px] px-2 py-1 rounded-full">ROUTER</div>
+                            </div>
+                            <div class="flex gap-2 w-full justify-center">
+                                <div class="w-1/4 h-20 bg-gray-200 rounded flex items-center justify-center text-[10px] text-gray-400 border border-gray-300">Expert 1</div>
+                                <div class="w-1/4 h-20 bg-arch-moe rounded flex items-center justify-center text-xs text-white font-bold shadow-lg border-2 border-white ring-2 ring-arch-moe">Expert 2<br>(Active)</div>
+                                <div class="w-1/4 h-20 bg-gray-200 rounded flex items-center justify-center text-[10px] text-gray-400 border border-gray-300">Expert 3</div>
+                            </div>
+                            <div class="w-full border-b-2 border-gray-400 border-dashed mt-4 relative flex justify-center">
+                                <div class="absolute -bottom-3 bg-gray-700 text-white text-[10px] px-2 py-1 rounded-full">COMBINE</div>
+                            </div>
+                            <div class="layer bg-gray-300 text-gray-700 text-xs shadow-sm w-1/2 mt-4">Output</div>
+                        </div>
+                    `
+                },
+                ssm: {
+                    title: "State Space Models (Mamba)",
+                    badge: "The linear challenger",
+                    color: "#FDCB6E",
+                    desc: "SSMs, particularly architectures like Mamba, replace the quadratic attention mechanism with continuous state-space equations discretized for deep learning. They process data sequentially (like old RNNs) but do so via hardware-aware parallel scans, resulting in linear O(N) scaling for sequence length.",
+                    pros: [
+                        "Linear time complexity for long context",
+                        "Constant memory during inference (no expanding KV cache)",
+                        "5x faster throughput on long sequences"
+                    ],
+                    cons: [
+                        "Slightly lower recall on complex 'needle in haystack' tasks vs Transformers",
+                        "Sequential nature makes training slightly harder to scale",
+                        "Still maturing ecosystem"
+                    ],
+                    diagramHTML: `
+                        <div class="flex items-center w-full gap-2 relative">
+                            <!-- Flow line -->
+                            <div class="absolute top-1/2 left-0 w-full h-1 bg-arch-ssm/30 -z-10"></div>
+                            
+                            <div class="flex flex-col gap-2 items-center flex-1">
+                                <div class="text-[10px] text-gray-500">t=1</div>
+                                <div class="w-10 h-10 bg-arch-ssm text-white rounded shadow-md flex items-center justify-center text-xs font-bold">H₁</div>
+                            </div>
+                            <div class="text-arch-ssm text-xl">&rarr;</div>
+                            <div class="flex flex-col gap-2 items-center flex-1">
+                                <div class="text-[10px] text-gray-500">t=2</div>
+                                <div class="w-12 h-12 bg-arch-ssm text-white rounded shadow-md flex items-center justify-center text-xs font-bold">H₂</div>
+                            </div>
+                            <div class="text-arch-ssm text-xl">&rarr;</div>
+                            <div class="flex flex-col gap-2 items-center flex-1">
+                                <div class="text-[10px] text-gray-500">t=3</div>
+                                <div class="w-14 h-14 bg-arch-ssm text-white rounded shadow-md flex items-center justify-center text-xs font-bold shadow-[0_0_15px_rgba(253,203,110,0.5)]">H₃</div>
+                            </div>
+                            
+                            <div class="absolute bottom-0 w-full text-center text-[10px] text-gray-500 mt-4 italic">Hidden state continuously updates and selectively forgets.</div>
+                        </div>
+                    `
+                },
+                lnn: {
+                    title: "Liquid Neural Networks",
+                    badge: "Continuous & Edge AI",
+                    color: "#D63031",
+                    desc: "Inspired by biological brains (like the C. elegans worm), LNNs feature continuous-time differential equations. Unlike standard neural networks that are frozen after training, the 'weights' in an LNN change continuously during inference based on the incoming data, making them incredibly adaptable to new, noisy environments.",
+                    pros: [
+                        "Learns and adapts continuously post-training",
+                        "Extremely parameter efficient (can drive cars with ~20k nodes)",
+                        "Highly resilient to noise and edge cases"
+                    ],
+                    cons: [
+                        "Math is computationally heavy per node (differential equations)",
+                        "Hard to scale to billions of parameters currently",
+                        "Niche applications (robotics, time-series) over general text"
+                    ],
+                    diagramHTML: `
+                        <div class="relative w-full h-48 flex items-center justify-center">
+                            <!-- Nodes -->
+                            <div class="node bg-arch-lnn absolute top-4 left-1/4 animate-pulse duration-1000 shadow-[0_0_15px_rgba(214,48,49,0.6)] text-xs">N1</div>
+                            <div class="node bg-arch-lnn absolute bottom-4 left-1/3 animate-pulse duration-700 shadow-[0_0_10px_rgba(214,48,49,0.4)] text-xs">N2</div>
+                            <div class="node bg-arch-lnn absolute top-1/2 right-1/4 animate-pulse duration-1000 shadow-[0_0_20px_rgba(214,48,49,0.8)] text-xs">N3</div>
+                            
+                            <!-- Dynamic Connections (CSS Borders) -->
+                            <div class="absolute top-10 left-1/4 w-1/3 h-20 border-t-2 border-r-2 border-arch-lnn/50 rounded-tr-[100px] border-dashed"></div>
+                            <div class="absolute bottom-10 left-1/3 w-1/3 h-16 border-b-2 border-r-2 border-arch-lnn/80 rounded-br-[50px]"></div>
+                            
+                            <div class="absolute -bottom-6 text-[10px] text-gray-500 italic bg-white px-2 rounded-full">Connections (synapses) change dynamically during inference</div>
+                        </div>
+                    `
+                }
+            };
+
+            // --- 2. Tab Interaction Logic ---
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const contentPane = document.getElementById('content-pane');
+            
+            // DOM elements to update
+            const elTitle = document.getElementById('arch-title');
+            const elBadge = document.getElementById('arch-badge');
+            const elDesc = document.getElementById('arch-desc');
+            const elPros = document.getElementById('arch-pros');
+            const elCons = document.getElementById('arch-cons');
+            const elDiagram = document.getElementById('diagram-container');
+
+            function updateContent(targetId) {
+                const data = architectureData[targetId];
+                
+                // Fade out
+                contentPane.style.opacity = 0;
+                
+                setTimeout(() => {
+                    // Update content
+                    elTitle.textContent = data.title;
+                    elBadge.textContent = data.badge;
+                    elBadge.style.backgroundColor = data.color;
+                    elDesc.textContent = data.desc;
+                    
+                    elPros.innerHTML = data.pros.map(pro => `<li>&bull; ${pro}</li>`).join('');
+                    elCons.innerHTML = data.cons.map(con => `<li>&bull; ${con}</li>`).join('');
+                    
+                    elDiagram.innerHTML = data.diagramHTML;
+
+                    // Fade in
+                    contentPane.style.opacity = 1;
+                }, 200); // match transition duration
+            }
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Remove active from all
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active', 'border-brand-text', 'text-brand-text');
+                        b.classList.add('border-transparent', 'text-brand-muted');
+                        b.style.borderBottomColor = 'transparent';
+                    });
+                    
+                    // Add active to clicked
+                    const target = e.target.getAttribute('data-target');
+                    e.target.classList.add('active', 'text-brand-text');
+                    e.target.classList.remove('text-brand-muted');
+                    e.target.style.borderBottomColor = architectureData[target].color;
+                    
+                    updateContent(target);
+                });
+            });
+
+
+            // --- 3. Chart.js Initialization ---
+            
+            // Shared Chart Config
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = "#636E72";
+
+            // Chart 1: Context Window Evolution (Line Chart)
+            const ctxContext = document.getElementById('contextChart').getContext('2d');
+            new Chart(ctxContext, {
+                type: 'line',
+                data: {
+                    labels: ['2017', '2019', '2021', '2023', '2024', '2025+'],
+                    datasets: [
+                        {
+                            label: 'Standard Transformer Config',
+                            data: [512, 1024, 4096, 32000, 128000, 200000],
+                            borderColor: '#0984E3',
+                            backgroundColor: 'rgba(9, 132, 227, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#0984E3',
+                            pointRadius: 4
+                        },
+                        {
+                            label: 'SSM / State Space Limit',
+                            data: [null, null, null, null, 1000000, 10000000], // Extrapolated
+                            borderColor: '#FDCB6E',
+                            borderWidth: 3,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointBackgroundColor: '#FDCB6E',
+                            pointRadius: 6,
+                            pointStyle: 'rectRot'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // CRITICAL for filling container
+                    scales: {
+                        y: {
+                            type: 'logarithmic', // Log scale shows exponential growth better
+                            title: {
+                                display: true,
+                                text: 'Max Tokens (Log Scale)'
+                            },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    if(value === 100 || value === 1000 || value === 10000 || value === 100000 || value === 1000000 || value === 10000000) {
+                                        return value.toLocaleString();
+                                    }
+                                    return null;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(45, 52, 54, 0.9)',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US').format(context.parsed.y) + ' tokens';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+
+            // Chart 2: Radar Comparison Chart
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Training Efficiency', 
+                        'Inference Speed', 
+                        'Context Length', 
+                        'Edge Adaptability'
+                    ],
+                    datasets: [
+                        {
+                            label: 'Transformer',
+                            data: [4, 5, 6, 3],
+                            backgroundColor: 'rgba(9, 132, 227, 0.2)',
+                            borderColor: '#0984E3',
+                            pointBackgroundColor: '#0984E3',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'MoE',
+                            data: [8, 7, 6, 2],
+                            backgroundColor: 'rgba(0, 184, 148, 0.2)',
+                            borderColor: '#00B894',
+                            pointBackgroundColor: '#00B894',
+                            borderWidth: 2,
+                            hidden: false
+                        },
+                        {
+                            label: 'Mamba (SSM)',
+                            data: [6, 9, 9, 6],
+                            backgroundColor: 'rgba(253, 203, 110, 0.2)',
+                            borderColor: '#FDCB6E',
+                            pointBackgroundColor: '#FDCB6E',
+                            borderWidth: 2,
+                            hidden: false
+                        },
+                        {
+                            label: 'Liquid Net',
+                            data: [3, 8, 4, 10],
+                            backgroundColor: 'rgba(214, 48, 49, 0.2)',
+                            borderColor: '#D63031',
+                            pointBackgroundColor: '#D63031',
+                            borderWidth: 2,
+                            hidden: true // Hidden by default to reduce clutter, users can toggle
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0,0,0,0.1)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            pointLabels: {
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                },
+                                color: '#2D3436'
+                            },
+                            ticks: {
+                                display: false, // Hide numeric ticks on radar
+                                min: 0,
+                                max: 10
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(45, 52, 54, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '/10';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
