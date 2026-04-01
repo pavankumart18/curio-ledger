@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Unlabeled Self</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcfbf9; color: #333333; }
+        h1, h2, h3, .serif { font-family: 'Lora', serif; }
+        
+        .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
+        .fade-in { opacity: 1; transition: opacity 1.2s ease; }
+        .hidden-start { opacity: 0; }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 450px;
+        }
+        @media (max-width: 640px) { .chart-container { height: 300px; } }
+
+        .tab-active { border-bottom: 2px solid #0f766e; color: #0f766e; font-weight: 600; }
+        
+        .particle-canvas {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(to bottom, #fcfbf9, #f3f0ea);
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Warm Neutrals (Stone/Taupe) with subtle Teal accents (#0f766e) for a calm, introspective feel. -->
+    
+    <!-- Application Structure Plan: 
+         1. Introduction: Establishes the paradox of the question.
+         2. Interactive "Stripping" Exercise: Users manually click away common labels (jobs, hobbies) to physically enact the premise of the prompt.
+         3. Conceptual Data Mapping: Uses a Polar Area chart to visualize the abstract components of identity that remain (Awareness, Presence, etc.).
+         4. Philosophical Lenses: A tabbed interface allowing users to explore different frameworks for answering the question without attributes.
+         This structure moves the user from the concrete (removing what they are not) to the abstract (visualizing core traits) to the philosophical (providing actual frameworks for an answer). 
+    -->
+    
+    <!-- Visualization & Content Choices: 
+         - Interactive HTML Buttons: Goal: Enact the removal of labels. Justification: Tactile engagement reinforces the concept of stripping away external identity.
+         - Polar Area Chart (Chart.js): Goal: Visualize abstract concepts. Justification: Since there is no hard numerical data, a conceptual radar/polar chart shows how "The Self" is comprised of non-quantifiable states (Presence, Intent) rather than achievements.
+         - HTML5 Canvas Particle Animation: Goal: Represent "Pure Awareness". Justification: A gentle, moving abstraction serves as a visual metaphor for consciousness without form.
+         - Tabbed Text Content: Goal: Provide specific answer frameworks. Justification: Organizes dense philosophical text into easily digestible, user-controlled chunks. 
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="w-full max-w-5xl mx-auto px-6 py-12 text-center">
+        <h1 class="text-4xl md:text-5xl font-semibold mb-4 text-stone-800">The Unlabeled Self</h1>
+        <p class="text-lg md:text-xl text-stone-600 max-w-2xl mx-auto font-light">
+            An interactive exploration of identity when stripped of background, profession, abilities, hobbies, and achievements.
+        </p>
+    </header>
+
+    <main class="flex-grow w-full max-w-5xl mx-auto px-6 pb-20 space-y-24">
+
+        <section id="exercise-section" class="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-stone-100">
+            <h2 class="text-3xl mb-4 text-stone-800 text-center">Phase 1: The Subtraction</h2>
+            <p class="text-stone-600 mb-8 text-center max-w-3xl mx-auto">
+                Before we can answer who you are, we must remove who you are not. Click the labels below to strip away the external identifiers we usually use to define ourselves.
+            </p>
+            
+            <div id="label-container" class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="label-btn px-6 py-3 bg-stone-200 text-stone-700 rounded-full hover:bg-stone-300 transition-colors shadow-sm text-lg">My Career</button>
+                <button class="label-btn px-6 py-3 bg-stone-200 text-stone-700 rounded-full hover:bg-stone-300 transition-colors shadow-sm text-lg">My Past</button>
+                <button class="label-btn px-6 py-3 bg-stone-200 text-stone-700 rounded-full hover:bg-stone-300 transition-colors shadow-sm text-lg">My Skills</button>
+                <button class="label-btn px-6 py-3 bg-stone-200 text-stone-700 rounded-full hover:bg-stone-300 transition-colors shadow-sm text-lg">My Hobbies</button>
+                <button class="label-btn px-6 py-3 bg-stone-200 text-stone-700 rounded-full hover:bg-stone-300 transition-colors shadow-sm text-lg">My Trophies</button>
+                <button class="label-btn px-6 py-3 bg-stone-200 text-stone-700 rounded-full hover:bg-stone-300 transition-colors shadow-sm text-lg">My Demographics</button>
+            </div>
+
+            <div id="revelation-text" class="hidden-start text-center">
+                <h3 class="text-2xl text-teal-800 mb-4 serif italic">What remains?</h3>
+                <p class="text-stone-700 max-w-2xl mx-auto leading-relaxed">
+                    When the modifiers are removed, the noun remains. You are not the weather (the skills, the jobs, the history); you are the sky in which the weather happens. You are the observer.
+                </p>
+            </div>
+        </section>
+
+        <section class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl mb-6 text-stone-800">Conceptualizing the Core</h2>
+                <p class="text-stone-600 mb-6 leading-relaxed">
+                    If we map the "Self" without using external achievements, we must look at abstract, internal states. This conceptual chart visualizes the pillars of an unlabeled identity. It is not about *how much* you have, but the active states of being you inhabit.
+                </p>
+                <ul class="space-y-4 text-stone-700">
+                    <li class="flex items-start">
+                        <span class="text-teal-600 font-bold mr-2">&#8226;</span>
+                        <span><strong>Awareness:</strong> The capacity to observe thoughts and surroundings without immediate judgment.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-teal-600 font-bold mr-2">&#8226;</span>
+                        <span><strong>Presence:</strong> The anchor to the current moment, separate from past regrets or future anxieties.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-teal-600 font-bold mr-2">&#8226;</span>
+                        <span><strong>Intent:</strong> The underlying moral or energetic direction of your actions, regardless of outcome.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-teal-600 font-bold mr-2">&#8226;</span>
+                        <span><strong>Connection:</strong> The shared humanity and empathy that binds you to others outside of social hierarchies.</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-center items-center">
+                <div class="chart-container">
+                    <canvas id="coreIdentityChart"></canvas>
+                </div>
+                <p class="text-xs text-stone-400 mt-4 text-center w-full uppercase tracking-wider">Conceptual Mapping of Internal States</p>
+            </div>
+        </section>
+
+        <section class="bg-stone-800 text-stone-100 p-8 md:p-12 rounded-2xl shadow-lg relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-3xl mb-6 text-white text-center">The Frameworks of Answering</h2>
+                <p class="text-stone-300 mb-10 text-center max-w-3xl mx-auto">
+                    How do you actually verbalize the answer to "Who Am I" in a conversation or interview without listing your resume? Choose a lens to explore different approaches.
+                </p>
+
+                <div class="flex flex-wrap justify-center border-b border-stone-600 mb-8">
+                    <button class="tab-btn px-6 py-3 text-lg text-stone-400 hover:text-white transition-colors tab-active" data-target="lens-values">The Values Lens</button>
+                    <button class="tab-btn px-6 py-3 text-lg text-stone-400 hover:text-white transition-colors" data-target="lens-curiosity">The Curiosity Lens</button>
+                    <button class="tab-btn px-6 py-3 text-lg text-stone-400 hover:text-white transition-colors" data-target="lens-existential">The Existential Lens</button>
+                </div>
+
+                <div id="lens-values" class="tab-content">
+                    <h3 class="text-2xl text-teal-400 mb-3 serif">Answer through your Core Principles</h3>
+                    <p class="text-stone-300 leading-relaxed mb-4">
+                        Instead of stating what you *do*, state what you *stand for*. This approach defines you by your internal compass rather than external validation.
+                    </p>
+                    <div class="bg-stone-700 p-6 rounded-lg border-l-4 border-teal-500">
+                        <p class="italic text-stone-200">
+                            "I am someone who values deep connection over superficial interaction. I am driven by a fundamental belief in fairness and a desire to leave spaces better than I found them. My identity is rooted in the continuous pursuit of integrity, rather than any specific title I hold."
+                        </p>
+                    </div>
+                </div>
+
+                <div id="lens-curiosity" class="tab-content hidden">
+                    <h3 class="text-2xl text-teal-400 mb-3 serif">Answer through your Questions</h3>
+                    <p class="text-stone-300 leading-relaxed mb-4">
+                        You can define yourself not by the answers you have (achievements, skills), but by the questions you are actively trying to solve in your life. This frames identity as a journey.
+                    </p>
+                    <div class="bg-stone-700 p-6 rounded-lg border-l-4 border-teal-500">
+                        <p class="italic text-stone-200">
+                            "I am an observer fascinated by how people communicate. I am someone constantly exploring the balance between discipline and freedom. Right now, I am defined by my curiosity about how we can build better communities in an increasingly isolated world."
+                        </p>
+                    </div>
+                </div>
+
+                <div id="lens-existential" class="tab-content hidden">
+                    <h3 class="text-2xl text-teal-400 mb-3 serif">Answer through Pure Subjectivity</h3>
+                    <p class="text-stone-300 leading-relaxed mb-4">
+                        The deepest philosophical answer. Acknowledging that the "self" is an illusion of memory, and you are simply the localized point of consciousness experiencing the present moment.
+                    </p>
+                    <div class="bg-stone-700 p-6 rounded-lg border-l-4 border-teal-500">
+                        <p class="italic text-stone-200">
+                            "I am the awareness that is currently experiencing this conversation. I am a process, constantly changing from moment to moment, shaped by interactions but not bound by past definitions. I am a verb, not a noun."
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <canvas id="bg-canvas" class="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none z-0"></canvas>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-200 py-8 text-center text-stone-500 text-sm">
+        <p>A conceptual exploration. The answer is found in the asking.</p>
+    </footer>
+
+    <script>
+        // --- Interactive Subtraction Logic ---
+        const buttons = document.querySelectorAll('.label-btn');
+        const revelationText = document.getElementById('revelation-text');
+        let clickedCount = 0;
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.add('fade-out');
+                clickedCount++;
+                if(clickedCount === buttons.length) {
+                    setTimeout(() => {
+                        revelationText.classList.remove('hidden-start');
+                        revelationText.classList.add('fade-in');
+                    }, 500);
+                }
+            });
+        });
+
+        // --- Chart.js Implementation ---
+        const ctx = document.getElementById('coreIdentityChart').getContext('2d');
+        const coreIdentityChart = new Chart(ctx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Awareness', 'Presence', 'Intent', 'Connection', 'Curiosity'],
+                datasets: [{
+                    label: 'Conceptual Weight',
+                    data: [8, 7, 9, 8, 9], // Abstract values representing balance
+                    backgroundColor: [
+                        'rgba(15, 118, 110, 0.6)',  // Teal
+                        'rgba(168, 162, 158, 0.6)', // Stone
+                        'rgba(45, 55, 72, 0.6)',    // Dark Slate
+                        'rgba(214, 211, 209, 0.6)', // Light Stone
+                        'rgba(20, 184, 166, 0.6)'   // Light Teal
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        ticks: { display: false },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            font: { family: 'Inter', size: 12 },
+                            color: '#444'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const descriptions = {
+                                    'Awareness': 'Observing without judging.',
+                                    'Presence': 'Anchored in the now.',
+                                    'Intent': 'The compass guiding action.',
+                                    'Connection': 'Empathy and shared humanity.',
+                                    'Curiosity': 'The drive to understand.'
+                                };
+                                return descriptions[context.label] || '';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Tab Navigation Logic ---
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active states
+                tabBtns.forEach(b => {
+                    b.classList.remove('tab-active');
+                    b.style.color = ''; 
+                    b.style.borderColor = '';
+                });
+                tabContents.forEach(c => c.classList.add('hidden'));
+
+                // Add active state to clicked
+                btn.classList.add('tab-active');
+                btn.style.color = '#5eead4'; // Tailwind teal-300 for dark bg
+                btn.style.borderColor = '#5eead4';
+                
+                const targetId = btn.getAttribute('data-target');
+                document.getElementById(targetId).classList.remove('hidden');
+                document.getElementById(targetId).classList.add('fade-in');
+            });
+        });
+
+        // --- HTML5 Canvas Animation (The Observer / Void representation) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctxt = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let particles = [];
+        for(let i=0; i<50; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 1,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                alpha: Math.random() * 0.5 + 0.1
+            });
+        }
+
+        function animateCanvas() {
+            requestAnimationFrame(animateCanvas);
+            ctxt.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Wrap around edges
+                if(p.x < 0) p.x = canvas.width;
+                if(p.x > canvas.width) p.x = 0;
+                if(p.y < 0) p.y = canvas.height;
+                if(p.y > canvas.height) p.y = 0;
+
+                ctxt.beginPath();
+                ctxt.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctxt.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+                ctxt.fill();
+            });
+            
+            // Draw subtle connecting lines to represent "connection"
+            for(let i=0; i<particles.length; i++) {
+                for(let j=i+1; j<particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if(dist < 100) {
+                        ctxt.beginPath();
+                        ctxt.moveTo(particles[i].x, particles[i].y);
+                        ctxt.lineTo(particles[j].x, particles[j].y);
+                        ctxt.strokeStyle = `rgba(255,255,255,${0.1 - dist/1000})`;
+                        ctxt.stroke();
+                    }
+                }
+            }
+        }
+        animateCanvas();
+    </script>
+</body>
+</html>
