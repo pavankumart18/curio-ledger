@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis II: The First Crewed Mission to the Moon in over 50 Years</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9;
+            color: #292524;
+            scroll-behavior: smooth;
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 45vh;
+            max-height: 450px;
+            min-height: 300px;
+        }
+
+        .crew-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .crew-card:hover, .crew-card.active {
+            transform: translateY(-5px);
+            border-color: #c2410c;
+            box-shadow: 0 10px 15px -3px rgba(194, 65, 12, 0.1), 0 4px 6px -2px rgba(194, 65, 12, 0.05);
+        }
+
+        .timeline-step {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid #d6d3d1;
+        }
+
+        .timeline-step.active {
+            border-left-color: #0369a1;
+            background-color: #f5f5f4;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Chosen Palette: Warm Neutrals (bg-stone-50, text-stone-800) with Sky Blue (sky-700) and Terracotta (orange-700) accents -->
+    
+    <!-- Application Structure Plan: A single-page dashboard structured into four key thematic sections: Mission Overview, The Crew, Mission Profile (Trajectory), and Hardware Capabilities. This logical flow moves the user from the "what" to the "who", then the "how" (timeline), and finally the "tools" (hardware). Interactive tabs and linked chart updates allow for non-linear exploration while maintaining the narrative context. -->
+    
+    <!-- Visualization & Content Choices: Overview -> Text/Stats (Inform) -> Sets context. Crew -> Interactive Cards/Details (Organize/Inform) -> Personalizes the mission. Trajectory -> Interactive Timeline linked to Chart.js Line Chart (Change/Compare) -> Visualizes the 10-day path and distance dynamically. Hardware -> Chart.js Bar Chart (Compare) -> Quantifies the immense power of SLS vs historical rockets. NO SVG or Mermaid used, all visualizations are Canvas or HTML/CSS driven. -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="fixed w-full z-50 bg-stone-100/90 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="text-xl font-bold tracking-tighter text-orange-700">ARTEMIS II</div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#overview" class="text-stone-600 hover:text-sky-700 text-sm font-semibold transition">Overview</a>
+                    <a href="#crew" class="text-stone-600 hover:text-sky-700 text-sm font-semibold transition">The Crew</a>
+                    <a href="#trajectory" class="text-stone-600 hover:text-sky-700 text-sm font-semibold transition">Trajectory</a>
+                    <a href="#hardware" class="text-stone-600 hover:text-sky-700 text-sm font-semibold transition">Hardware</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header id="overview" class="pt-32 pb-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-block px-4 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-bold tracking-widest mb-6">NASA REPORT DIGEST</div>
+            <h1 class="text-5xl md:text-7xl font-extrabold text-stone-900 tracking-tight mb-6">Humanity's Return to Deep Space.</h1>
+            <p class="text-xl text-stone-600 leading-relaxed mb-12">
+                Artemis II is the first crewed flight test of the Space Launch System (SLS) rocket and the Orion spacecraft. 
+                Paving the way for lunar surface missions, this approximately 10-day flight will test foundational human deep space exploration capabilities.
+            </p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-left border-t border-stone-200 pt-8">
+                <div>
+                    <div class="text-3xl font-bold text-sky-700">10</div>
+                    <div class="text-sm text-stone-500 uppercase tracking-wide">Days (Approx)</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-sky-700">4</div>
+                    <div class="text-sm text-stone-500 uppercase tracking-wide">Astronauts</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-sky-700">6.8k</div>
+                    <div class="text-sm text-stone-500 uppercase tracking-wide">Miles past Moon</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-sky-700">Mach 32</div>
+                    <div class="text-sm text-stone-500 uppercase tracking-wide">Re-entry Speed</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="crew" class="py-20 bg-stone-100 border-y border-stone-200">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-12 md:w-2/3">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">The Crew of Artemis II</h2>
+                <p class="text-stone-600">
+                    This section introduces the four individuals representing humanity. For the first time in over fifty years, 
+                    humans will venture beyond Low Earth Orbit. Interact with the cards below to explore the roles and backgrounds 
+                    of the diverse crew selected for this historic flyby.
+                </p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="w-full md:w-1/2 grid grid-cols-2 gap-4" id="crew-grid">
+                    <div class="crew-card active bg-white p-6 rounded-xl border-2 border-orange-700 shadow-sm" data-id="wiseman">
+                        <div class="text-4xl mb-3">👨‍🚀</div>
+                        <h3 class="font-bold text-stone-900">Reid Wiseman</h3>
+                        <p class="text-sm text-sky-700 font-semibold">Commander</p>
+                    </div>
+                    <div class="crew-card bg-white p-6 rounded-xl border-2 border-transparent shadow-sm" data-id="glover">
+                        <div class="text-4xl mb-3">👨🏾‍🚀</div>
+                        <h3 class="font-bold text-stone-900">Victor Glover</h3>
+                        <p class="text-sm text-sky-700 font-semibold">Pilot</p>
+                    </div>
+                    <div class="crew-card bg-white p-6 rounded-xl border-2 border-transparent shadow-sm" data-id="koch">
+                        <div class="text-4xl mb-3">👩🏻‍🚀</div>
+                        <h3 class="font-bold text-stone-900">Christina Koch</h3>
+                        <p class="text-sm text-sky-700 font-semibold">Mission Specialist</p>
+                    </div>
+                    <div class="crew-card bg-white p-6 rounded-xl border-2 border-transparent shadow-sm" data-id="hansen">
+                        <div class="text-4xl mb-3">👨🏼‍🚀</div>
+                        <h3 class="font-bold text-stone-900">Jeremy Hansen</h3>
+                        <p class="text-sm text-sky-700 font-semibold">Mission Specialist (CSA)</p>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2 bg-white rounded-xl p-8 shadow-sm border border-stone-200 min-h-[300px] flex flex-col justify-center fade-in" id="crew-detail-panel">
+                    <div class="inline-block px-3 py-1 bg-stone-100 text-stone-600 text-xs font-bold uppercase tracking-wider rounded mb-4" id="crew-role">Commander</div>
+                    <h3 class="text-3xl font-bold text-stone-900 mb-4" id="crew-name">Reid Wiseman</h3>
+                    <p class="text-stone-600 leading-relaxed mb-6" id="crew-bio">
+                        Wiseman served as flight engineer aboard the International Space Station for Expedition 41/42. 
+                        As Commander of Artemis II, he is responsible for the overall execution of the mission, crew safety, and spacecraft operations during the 10-day journey.
+                    </p>
+                    <div class="bg-sky-50 text-sky-800 p-4 rounded-lg text-sm border border-sky-100" id="crew-fact">
+                        <strong>Key Insight:</strong> Leads the first crewed deep space mission since Apollo 17.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="trajectory" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-12 md:w-2/3">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Mission Profile & Trajectory</h2>
+                <p class="text-stone-600">
+                    Understanding the path is critical. Artemis II will utilize a "hybrid free-return trajectory." 
+                    This section visualizes the 10-day timeline. Click through the mission phases to see how the Orion 
+                    spacecraft builds orbital momentum before committing to the lunar flyby, ensuring a safe return path using Earth's gravity.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+                <div class="lg:col-span-1 space-y-2" id="timeline-container">
+                    <div class="timeline-step active p-4 rounded-r-lg" data-step="0">
+                        <div class="font-bold text-stone-900">1. Launch & Earth Orbit</div>
+                        <div class="text-sm text-stone-500">Day 1</div>
+                    </div>
+                    <div class="timeline-step p-4 rounded-r-lg" data-step="1">
+                        <div class="font-bold text-stone-900">2. High Earth Orbit</div>
+                        <div class="text-sm text-stone-500">Day 1 - 2</div>
+                    </div>
+                    <div class="timeline-step p-4 rounded-r-lg" data-step="2">
+                        <div class="font-bold text-stone-900">3. Trans-Lunar Injection (TLI)</div>
+                        <div class="text-sm text-stone-500">Day 2</div>
+                    </div>
+                    <div class="timeline-step p-4 rounded-r-lg" data-step="3">
+                        <div class="font-bold text-stone-900">4. Outbound Transit</div>
+                        <div class="text-sm text-stone-500">Day 2 - 5</div>
+                    </div>
+                    <div class="timeline-step p-4 rounded-r-lg" data-step="4">
+                        <div class="font-bold text-stone-900">5. Lunar Flyby</div>
+                        <div class="text-sm text-stone-500">Day 5</div>
+                    </div>
+                    <div class="timeline-step p-4 rounded-r-lg" data-step="5">
+                        <div class="font-bold text-stone-900">6. Return Transit</div>
+                        <div class="text-sm text-stone-500">Day 6 - 9</div>
+                    </div>
+                    <div class="timeline-step p-4 rounded-r-lg" data-step="6">
+                        <div class="font-bold text-stone-900">7. Splashdown</div>
+                        <div class="text-sm text-stone-500">Day 10</div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-stone-200">
+                    <div class="mb-6 fade-in" id="phase-details">
+                        <h3 class="text-xl font-bold text-sky-700 mb-2">Launch & Earth Orbit</h3>
+                        <p class="text-stone-600 text-sm">
+                            The SLS rocket launches Orion from Kennedy Space Center. After reaching initial Earth orbit, the Interim Cryogenic Propulsion Stage (ICPS) fires to raise the orbit, testing life support systems close to home.
+                        </p>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="trajectoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="hardware" class="py-20 bg-stone-900 text-stone-100 border-t-8 border-orange-700">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-12 md:w-2/3">
+                <h2 class="text-3xl font-bold text-white mb-4">Hardware Capabilities</h2>
+                <p class="text-stone-400">
+                    The backbone of the Artemis missions lies in the unprecedented power of the Space Launch System (SLS) 
+                    and the advanced technology of the Orion crew module. This section compares key metrics of the launch vehicle 
+                    against historical benchmarks to provide scale and context to the engineering achievement.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="chart-container bg-stone-800 p-4 rounded-xl">
+                        <canvas id="hardwareChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-stone-800 p-6 rounded-xl border border-stone-700">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">🚀</span>
+                            <h3 class="text-xl font-bold text-white">Space Launch System (Block 1)</h3>
+                        </div>
+                        <p class="text-stone-400 text-sm">
+                            Producing 8.8 million pounds of maximum thrust, the SLS is the most powerful rocket ever launched by NASA. It utilizes four RS-25 engines (heritage Space Shuttle hardware) and two massive solid rocket boosters.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-stone-800 p-6 rounded-xl border border-stone-700">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">🛰️</span>
+                            <h3 class="text-xl font-bold text-white">Orion & ESM</h3>
+                        </div>
+                        <p class="text-stone-400 text-sm">
+                            The Orion crew module, powered by the European Service Module (ESM) which provides air, water, power, and propulsion, is designed to sustain humans in deep space farther and longer than any previous spacecraft.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-stone-950 text-stone-500 py-8 text-center text-sm">
+        <div class="max-w-6xl mx-auto px-4">
+            <p>Artemis II Interactive Briefing. Created for analytical and exploratory purposes.</p>
+        </div>
+    </footer>
+
+    <script>
+        const crewData = {
+            wiseman: {
+                name: "Reid Wiseman",
+                role: "Commander",
+                bio: "Wiseman served as flight engineer aboard the International Space Station for Expedition 41/42. As Commander of Artemis II, he is responsible for the overall execution of the mission, crew safety, and spacecraft operations during the 10-day journey.",
+                fact: "Leads the first crewed deep space mission since Apollo 17."
+            },
+            glover: {
+                name: "Victor Glover",
+                role: "Pilot",
+                bio: "Glover was the pilot on NASA's SpaceX Crew-1 mission. For Artemis II, he will work closely with the Commander to pilot Orion, especially during critical maneuvers around Earth and the Moon.",
+                fact: "First person of color to leave low Earth orbit."
+            },
+            koch: {
+                name: "Christina Koch",
+                role: "Mission Specialist",
+                bio: "Koch holds the record for the longest single spaceflight by a woman. She will serve as a flight engineer, managing Orion's systems and conducting scientific observations during the journey.",
+                fact: "Participated in the first all-female spacewalks on the ISS."
+            },
+            hansen: {
+                name: "Jeremy Hansen",
+                role: "Mission Specialist (CSA)",
+                bio: "Representing the Canadian Space Agency, Hansen is making his first spaceflight. He will assist with systems operations and mission timeline execution, highlighting the international nature of Artemis.",
+                fact: "First non-American to fly to the Moon."
+            }
+        };
+
+        const crewCards = document.querySelectorAll('.crew-card');
+        const crewNameEl = document.getElementById('crew-name');
+        const crewRoleEl = document.getElementById('crew-role');
+        const crewBioEl = document.getElementById('crew-bio');
+        const crewFactEl = document.getElementById('crew-fact');
+        const crewPanel = document.getElementById('crew-detail-panel');
+
+        crewCards.forEach(card => {
+            card.addEventListener('click', () => {
+                crewCards.forEach(c => {
+                    c.classList.remove('active', 'border-orange-700');
+                    c.classList.add('border-transparent');
+                });
+                
+                card.classList.add('active', 'border-orange-700');
+                card.classList.remove('border-transparent');
+                
+                const id = card.getAttribute('data-id');
+                const data = crewData[id];
+                
+                crewPanel.classList.remove('fade-in');
+                void crewPanel.offsetWidth; 
+                
+                crewRoleEl.textContent = data.role;
+                crewNameEl.textContent = data.name;
+                crewBioEl.textContent = data.bio;
+                crewFactEl.innerHTML = `<strong>Key Insight:</strong> ${data.fact}`;
+                
+                crewPanel.classList.add('fade-in');
+            });
+        });
+
+        const phaseData = [
+            { title: "Launch & Earth Orbit", desc: "The SLS rocket launches Orion from Kennedy Space Center. After reaching initial Earth orbit, the Interim Cryogenic Propulsion Stage (ICPS) fires to raise the orbit, testing life support systems close to home." },
+            { title: "High Earth Orbit", desc: "Orion spends about 24 hours in a highly elliptical orbit. The crew performs checkouts of the spacecraft's life support and manual piloting systems using the ICPS as a target." },
+            { title: "Trans-Lunar Injection (TLI)", desc: "The ICPS performs the massive TLI burn, pushing Orion out of Earth orbit and onto a precise trajectory intersecting the Moon's path." },
+            { title: "Outbound Transit", desc: "Orion separates from the ICPS and coasts for several days through translunar space. The crew monitors systems and prepares for the lunar flyby." },
+            { title: "Lunar Flyby", desc: "The spacecraft swings around the far side of the Moon, utilizing lunar gravity to slingshot back toward Earth without requiring engine propulsion for the return trip (free-return)." },
+            { title: "Return Transit", desc: "Coasting back to Earth, the crew continues system tests and deep space environment monitoring, preparing for the high-velocity re-entry." },
+            { title: "Splashdown", desc: "The Crew Module separates from the Service Module, hitting Earth's atmosphere at Mach 32, before parachutes deploy for a safe splashdown in the Pacific Ocean." }
+        ];
+
+        const ctxTrajectory = document.getElementById('trajectoryChart').getContext('2d');
+        let trajectoryChart = new Chart(ctxTrajectory, {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 8', 'Day 10'],
+                datasets: [{
+                    label: 'Distance from Earth (x1000 km)',
+                    data: [1, 50, 150, 280, 400, 280, 150, 0],
+                    borderColor: '#0369a1',
+                    backgroundColor: 'rgba(3, 105, 161, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#0369a1',
+                    pointRadius: [6, 4, 4, 4, 4, 4, 4, 4],
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + ',000 km';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 450,
+                        title: { display: true, text: 'Distance (1000s km)', color: '#78716c' },
+                        grid: { color: '#e7e5e4' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        const timelineSteps = document.querySelectorAll('.timeline-step');
+        const phaseDetailsEl = document.getElementById('phase-details');
+
+        timelineSteps.forEach(step => {
+            step.addEventListener('click', () => {
+                timelineSteps.forEach(s => s.classList.remove('active'));
+                step.classList.add('active');
+                
+                const stepIndex = parseInt(step.getAttribute('data-step'));
+                const data = phaseData[stepIndex];
+                
+                phaseDetailsEl.classList.remove('fade-in');
+                void phaseDetailsEl.offsetWidth;
+                
+                phaseDetailsEl.innerHTML = `
+                    <h3 class="text-xl font-bold text-sky-700 mb-2">${data.title}</h3>
+                    <p class="text-stone-600 text-sm">${data.desc}</p>
+                `;
+                
+                phaseDetailsEl.classList.add('fade-in');
+
+                let newPointRadii = [4, 4, 4, 4, 4, 4, 4, 4];
+                if(stepIndex === 0) newPointRadii[0] = 8;
+                if(stepIndex === 1) newPointRadii[1] = 8;
+                if(stepIndex === 2) newPointRadii[1] = 8; 
+                if(stepIndex === 3) { newPointRadii[2] = 8; newPointRadii[3] = 8; }
+                if(stepIndex === 4) newPointRadii[4] = 8;
+                if(stepIndex === 5) { newPointRadii[5] = 8; newPointRadii[6] = 8; }
+                if(stepIndex === 6) newPointRadii[7] = 8;
+
+                trajectoryChart.data.datasets[0].pointRadius = newPointRadii;
+                trajectoryChart.data.datasets[0].pointBackgroundColor = newPointRadii.map(r => r === 8 ? '#c2410c' : '#fff');
+                trajectoryChart.update();
+            });
+        });
+
+        const ctxHardware = document.getElementById('hardwareChart').getContext('2d');
+        new Chart(ctxHardware, {
+            type: 'bar',
+            data: {
+                labels: ['Space Shuttle', 'Saturn V (Apollo)', 'SLS Block 1 (Artemis)'],
+                datasets: [{
+                    label: 'Liftoff Thrust (Millions of Pounds)',
+                    data: [7.8, 7.6, 8.8],
+                    backgroundColor: [
+                        'rgba(120, 113, 108, 0.6)',
+                        'rgba(120, 113, 108, 0.6)',
+                        'rgba(194, 65, 12, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(120, 113, 108, 1)',
+                        'rgba(120, 113, 108, 1)',
+                        'rgba(194, 65, 12, 1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                color: '#d6d3d1',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + ' Million lbs Thrust';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        title: { display: true, text: 'Thrust (Millions of lbs)', color: '#a8a29e' },
+                        grid: { color: '#44403c' },
+                        ticks: { color: '#a8a29e' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#d6d3d1', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
