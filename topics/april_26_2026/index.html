@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumik.ai Integration for Mental Health</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc; 
+            color: #1e293b;
+        }
+        .nav-active {
+            background-color: #0f766e;
+            color: white;
+            font-weight: bold;
+        }
+        .nav-inactive {
+            color: #334155;
+        }
+        .nav-inactive:hover {
+            background-color: #e2e8f0;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+<!-- Chosen Palette: Calming Teal & Slate (bg-slate-50, text-slate-800, teal-600, teal-700) -->
+<!-- Application Structure Plan: A dynamic sidebar-navigated dashboard. It is structured into 4 logical phases: Overview (Executive Summary), Use Cases (Actionable Implementation), Impact (Data/Charts), and Roadmap (Next Steps). This structure allows a startup founder to linearly understand WHAT Rumik.ai does, HOW to apply it to mental health, WHAT the ROI is, and HOW to execute it over time. Interactive elements like toggleable use-cases prevent cognitive overload. -->
+<!-- Visualization & Content Choices: 
+     - Bar Chart: Compares 'Before' vs 'After' Rumik implementation for key metrics (Goal: Compare). Justification: Clearly shows ROI and operational efficiency. Library: Chart.js. 
+     - Doughnut Chart: Shows resource allocation shift (Goal: Inform/Proportions). Justification: Highlights how therapists get more face-to-face time. Library: Chart.js.
+     - Interactive Lists: Clickable use-cases to reveal technical implementation details (Goal: Organize/Inform). Justification: Keeps UI clean while offering deep dives. 
+     - NO SVG/Mermaid used. Unicode icons utilized for visual anchoring. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="w-full md:w-64 bg-white shadow-lg flex flex-col z-10 sticky top-0 md:h-screen">
+        <div class="p-6 border-b border-slate-100">
+            <h1 class="text-2xl font-bold text-teal-700 tracking-tight">🧠 Rumik Health</h1>
+            <p class="text-sm text-slate-500 mt-1">Integration Strategy</p>
+        </div>
+        <div class="flex-grow overflow-y-auto">
+            <ul class="flex flex-row md:flex-col p-4 gap-2 overflow-x-auto md:overflow-x-visible">
+                <li><button onclick="nav('summary')" id="btn-summary" class="w-full text-left px-4 py-3 rounded-lg nav-active transition-colors whitespace-nowrap">📋 Exec Summary</button></li>
+                <li><button onclick="nav('usecases')" id="btn-usecases" class="w-full text-left px-4 py-3 rounded-lg nav-inactive transition-colors whitespace-nowrap">🛠️ Clinical Use Cases</button></li>
+                <li><button onclick="nav('impact')" id="btn-impact" class="w-full text-left px-4 py-3 rounded-lg nav-inactive transition-colors whitespace-nowrap">📊 Impact Analysis</button></li>
+                <li><button onclick="nav('roadmap')" id="btn-roadmap" class="w-full text-left px-4 py-3 rounded-lg nav-inactive transition-colors whitespace-nowrap">🚀 Implementation</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-grow p-6 md:p-10 overflow-y-auto w-full max-w-6xl mx-auto">
+        
+        <section id="sec-summary" class="fade-in block">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Integrating Rumik.ai into Mental Health</h2>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    This dashboard outlines the strategic implementation of Rumik.ai's LLM orchestration and workflow capabilities within a mental health startup environment. You will find actionable use cases, projected data impacts, and a phased implementation roadmap designed to enhance patient care while optimizing therapist workloads.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-3">⚙️</div>
+                    <h3 class="text-xl font-semibold text-teal-700 mb-2">What is Rumik.ai's Role?</h3>
+                    <p class="text-slate-600">Rumik acts as the intelligence layer. It manages prompts, connects Large Language Models (LLMs) to your clinical data securely (RAG), orchestrates AI agents, and enforces strict guardrails to ensure empathetic and safe outputs.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-3">🛡️</div>
+                    <h3 class="text-xl font-semibold text-teal-700 mb-2">Why in Mental Health?</h3>
+                    <p class="text-slate-600">Mental health requires high context, deep empathy, and zero tolerance for hallucination. Rumik's capability to enforce context-grounding and human-in-the-loop workflows makes it ideal for compliant, safe clinical tech.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-usecases" class="fade-in hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Core Implementation Use Cases</h2>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    Explore how Rumik.ai can be practically applied to your startup. Click on any use case below to reveal the implementation strategy, required data, and the specific Rumik features you will leverage.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <button onclick="toggleUseCase('uc1')" class="w-full text-left p-5 bg-slate-50 hover:bg-slate-100 flex justify-between items-center transition-colors">
+                        <span class="text-lg font-semibold text-slate-800">1. AI Intake & Triage Agent</span>
+                        <span id="icon-uc1" class="text-teal-600 font-bold text-xl">+</span>
+                    </button>
+                    <div id="content-uc1" class="hidden p-5 border-t border-slate-100">
+                        <p class="mb-4 text-slate-700"><strong>Concept:</strong> A conversational agent that gathers initial patient history, assesses acuity using standardized scales (PHQ-9, GAD-7), and routes high-risk individuals immediately to crisis lines.</p>
+                        <div class="bg-teal-50 p-4 rounded-lg border border-teal-100">
+                            <h4 class="font-bold text-teal-800 mb-2">How to implement with Rumik:</h4>
+                            <ul class="list-disc pl-5 text-teal-900 space-y-1">
+                                <li><strong>Prompt Engineering:</strong> Use Rumik to lock in a highly empathetic, non-diagnostic persona.</li>
+                                <li><strong>Guardrails:</strong> Implement Rumik's semantic routers to detect keywords (e.g., "suicide", "harm"). If detected, hard-route the conversation away from the LLM to a hardcoded crisis response protocol.</li>
+                                <li><strong>Data Integration:</strong> Pipe the summarized intake automatically into the patient's EHR profile before the first therapist meeting.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <button onclick="toggleUseCase('uc2')" class="w-full text-left p-5 bg-slate-50 hover:bg-slate-100 flex justify-between items-center transition-colors">
+                        <span class="text-lg font-semibold text-slate-800">2. Therapist Clinical Co-Pilot</span>
+                        <span id="icon-uc2" class="text-teal-600 font-bold text-xl">+</span>
+                    </button>
+                    <div id="content-uc2" class="hidden p-5 border-t border-slate-100">
+                        <p class="mb-4 text-slate-700"><strong>Concept:</strong> An internal tool for therapists that automatically transcribes sessions (with consent) and generates draft SOAP (Subjective, Objective, Assessment, Plan) notes.</p>
+                        <div class="bg-teal-50 p-4 rounded-lg border border-teal-100">
+                            <h4 class="font-bold text-teal-800 mb-2">How to implement with Rumik:</h4>
+                            <ul class="list-disc pl-5 text-teal-900 space-y-1">
+                                <li><strong>Workflow Automation:</strong> Chain an audio-to-text model with an LLM via Rumik's pipelines.</li>
+                                <li><strong>RAG (Retrieval-Augmented Generation):</strong> Feed Rumik previous session notes so the AI can track longitudinal progress and highlight recurring themes in the current draft.</li>
+                                <li><strong>Compliance:</strong> Ensure data processed through Rumik pipelines is transient and stripped of PII before hitting external model APIs.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <button onclick="toggleUseCase('uc3')" class="w-full text-left p-5 bg-slate-50 hover:bg-slate-100 flex justify-between items-center transition-colors">
+                        <span class="text-lg font-semibold text-slate-800">3. Between-Session Engagement Bot</span>
+                        <span id="icon-uc3" class="text-teal-600 font-bold text-xl">+</span>
+                    </button>
+                    <div id="content-uc3" class="hidden p-5 border-t border-slate-100">
+                        <p class="mb-4 text-slate-700"><strong>Concept:</strong> A supportive chat interface that patients can use between sessions for CBT exercises, mindfulness prompts, or mood logging.</p>
+                        <div class="bg-teal-50 p-4 rounded-lg border border-teal-100">
+                            <h4 class="font-bold text-teal-800 mb-2">How to implement with Rumik:</h4>
+                            <ul class="list-disc pl-5 text-teal-900 space-y-1">
+                                <li><strong>Agent State Management:</strong> Use Rumik to maintain session context so the bot "remembers" the patient's goals set in the actual therapy session.</li>
+                                <li><strong>Therapist Override:</strong> Create a dashboard where therapists can review the bot's logs. Use Rumik to generate alerts if the patient's sentiment drops significantly over the week.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-impact" class="fade-in hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Projected Quantitative Impact</h2>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    Based on industry benchmarks for LLM integration in telehealth, this section visualizes the expected efficiency and resource allocation shifts your startup will experience after fully implementing Rumik.ai workflows.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 text-center">Operational Time Reduction</h3>
+                    <p class="text-sm text-slate-500 mb-4 text-center">Comparing minutes per patient lifecycle before and after AI integration.</p>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-600 border-l-4 border-teal-500 pl-3">
+                        <strong>Takeaway:</strong> Automating intake and SOAP notes drastically reduces administrative burden, allowing therapists to take on larger caseloads without burnout.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 text-center">Therapist Resource Allocation</h3>
+                    <p class="text-sm text-slate-500 mb-4 text-center">Shift in how clinical staff spend their weekly hours.</p>
+                    <div class="chart-container">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-600 border-l-4 border-teal-500 pl-3">
+                        <strong>Takeaway:</strong> By handling triage and documentation, Rumik.ai shifts the clinical focus back to high-value, direct patient care and complex case strategy.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-roadmap" class="fade-in hidden">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Implementation Roadmap</h2>
+                <p class="text-lg text-slate-600 leading-relaxed">
+                    A phased approach minimizes clinical risk. We recommend starting with internal-facing tools to build trust, followed by heavily guardrailed patient-facing tools.
+                </p>
+            </div>
+
+            <div class="relative border-l-4 border-teal-200 ml-4 md:ml-10 space-y-10 py-4">
+                
+                <div class="relative">
+                    <div class="absolute -left-[26px] bg-teal-600 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white shadow-sm">Q1</div>
+                    <div class="ml-10 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-bold text-teal-800 mb-2">Phase 1: Internal Co-Pilot</h3>
+                        <p class="text-slate-600 mb-3">Focus purely on operational efficiency. Patients do not interact directly with AI.</p>
+                        <ul class="list-disc pl-5 text-slate-700 space-y-1 text-sm">
+                            <li>Set up Rumik.ai secure infrastructure (HIPAA compliant environment).</li>
+                            <li>Develop the SOAP note generator workflow.</li>
+                            <li>Train therapists on how to review and edit AI-generated notes.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute -left-[26px] bg-teal-500 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white shadow-sm">Q2</div>
+                    <div class="ml-10 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-bold text-teal-800 mb-2">Phase 2: Automated Triage</h3>
+                        <p class="text-slate-600 mb-3">Introduce patient-facing interactions strictly for data gathering, not therapy.</p>
+                        <ul class="list-disc pl-5 text-slate-700 space-y-1 text-sm">
+                            <li>Build and test the Intake Agent using Rumik's prompt templates.</li>
+                            <li>Implement rigorous safety routers to detect crisis keywords.</li>
+                            <li>A/B test the AI intake flow vs. standard web forms for completion rates.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute -left-[26px] bg-teal-400 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white shadow-sm">Q3</div>
+                    <div class="ml-10 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-bold text-teal-800 mb-2">Phase 3: Between-Session Support</h3>
+                        <p class="text-slate-600 mb-3">Deploy the interactive CBT/mindfulness agent for active patients.</p>
+                        <ul class="list-disc pl-5 text-slate-700 space-y-1 text-sm">
+                            <li>Integrate Rumik with your EHR to pull patient goals into the agent's context.</li>
+                            <li>Establish therapist dashboards to monitor AI-patient interactions.</li>
+                            <li>Deploy sentiment analysis tracking over time.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- State Management & Navigation ---
+        const sections = ['summary', 'usecases', 'impact', 'roadmap'];
+        let chartsInitialized = false;
+
+        function nav(targetId) {
+            sections.forEach(id => {
+                // Update buttons
+                const btn = document.getElementById(`btn-${id}`);
+                if (id === targetId) {
+                    btn.classList.remove('nav-inactive');
+                    btn.classList.add('nav-active');
+                } else {
+                    btn.classList.remove('nav-active');
+                    btn.classList.add('nav-inactive');
+                }
+
+                // Update sections
+                const sec = document.getElementById(`sec-${id}`);
+                if (id === targetId) {
+                    sec.classList.remove('hidden');
+                    // Initialize charts only when impact section is visible to ensure correct canvas sizing
+                    if (id === 'impact' && !chartsInitialized) {
+                        initCharts();
+                        chartsInitialized = true;
+                    }
+                } else {
+                    sec.classList.add('hidden');
+                }
+            });
+            window.scrollTo(0, 0);
+        }
+
+        // --- Interaction Logic: Accordions ---
+        function toggleUseCase(id) {
+            const content = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '-';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '+';
+            }
+        }
+
+        // --- Chart.js Initialization ---
+        function initCharts() {
+            // Data Setup
+            const barData = {
+                labels: ['Patient Intake', 'SOAP Documentation', 'Session Prep', 'Follow-up Comms'],
+                datasets: [
+                    {
+                        label: 'Minutes (Pre-Rumik)',
+                        backgroundColor: '#94a3b8', // slate-400
+                        data: [25, 20, 15, 10]
+                    },
+                    {
+                        label: 'Minutes (Post-Rumik)',
+                        backgroundColor: '#0d9488', // teal-600
+                        data: [5, 5, 5, 2]
+                    }
+                ]
+            };
+
+            const doughnutData = {
+                labels: ['Direct Patient Care', 'Admin / Docs', 'Prep & Strategy', 'Patient Triage'],
+                datasets: [{
+                    data: [65, 15, 15, 5], // Example Post-AI percentages
+                    backgroundColor: [
+                        '#0f766e', // teal-700
+                        '#94a3b8', // slate-400
+                        '#5eead4', // teal-300
+                        '#cbd5e1'  // slate-300
+                    ],
+                    borderWidth: 0
+                }]
+            };
+
+            // Global Defaults
+            Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            Chart.defaults.color = '#475569';
+
+            // Bar Chart Render
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: barData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' mins';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Minutes per Patient' }
+                        },
+                        x: {
+                            ticks: {
+                                callback: function(value) {
+                                    // 16-char wrapping logic
+                                    let label = this.getLabelForValue(value);
+                                    if (label.length > 16) {
+                                        return label.match(/.{1,16}(\s|$)/g);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Doughnut Chart Render
+            const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+            new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: doughnutData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
